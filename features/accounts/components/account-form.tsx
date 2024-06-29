@@ -66,7 +66,7 @@ export const AccountForm = ({
               <FormControl>
                 <Input
                   disabled={disabled}
-                  placeholder="e.g. Cash, Bank, Credit Card"
+                  placeholder="Digite o cpf da conta"
                   {...field}
                 />
               </FormControl>
@@ -74,7 +74,7 @@ export const AccountForm = ({
           )}
         />
         <Button className="w-full" disabled={disabled}>
-          {id ? "Save changes" : "Create account"}
+          {id ? "Salvar alterações" : "Criar conta"}
         </Button>
         {!!id && (
           <Button
@@ -85,7 +85,7 @@ export const AccountForm = ({
             variant="outline"
           >
             <Trash className="size-4 mr-2" />
-            Delete account
+            Deletar conta
           </Button>
         )}
       </form>
