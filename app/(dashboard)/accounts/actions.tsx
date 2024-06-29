@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit, MoreHorizontal, Trash } from "lucide-react";
+import { Edit, MoreHorizontal, Trash, KeyRoundIcon } from "lucide-react";
 
 import { useOpenAccount } from "@/features/accounts/hooks/use-open-account";
 import { useDeleteAccount } from "@/features/accounts/api/use-delete-account";
@@ -20,8 +20,8 @@ type Props = {
 
 export const Actions = ({ id }: Props) => {
   const [ConfirmDialog, confirm] = useConfirm(
-    "Are you sure?",
-    "You are about to delete this account."
+    "Você tem certeza?",
+    "Você está excluindo esta conta."
   );
 
   const deleteMutation = useDeleteAccount(id);
@@ -50,7 +50,14 @@ export const Actions = ({ id }: Props) => {
             onClick={() => onOpen(id)}
           >
             <Edit className="size-4 mr-2" />
-            Edit
+            Editar
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            disabled={deleteMutation.isPending}
+            onClick={() => onOpen(id)}
+          >
+            <KeyRoundIcon className="size-4 mr-2" />
+            Ativar chave pix
           </DropdownMenuItem>
           <DropdownMenuItem
             disabled={deleteMutation.isPending}
