@@ -50,6 +50,31 @@ export const columns: ColumnDef<ResponseType>[] = [
     }
   },
   {
+    accessorKey: "status",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Status
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: ({ row }) => {
+      const status = row.getValue("status");
+
+      return (
+        <Badge
+          variant={status ==="Inactive" ? "destructive" : "primary"}
+          className="text-xs font-medium px-3.5 py-2.5"
+        >
+        </Badge>
+      );
+    }
+  },
+  {
     accessorKey: "amount",
     header: ({ column }) => {
       return (

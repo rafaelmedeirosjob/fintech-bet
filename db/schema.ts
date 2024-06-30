@@ -8,6 +8,44 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 
+export const users = pgTable("users", {
+  id: text("id").primaryKey(),
+  documentNumber: text("documentNumber"),
+  phoneNumber: text("phoneNumber"),
+  email: text("email"),
+  motherName: text("motherName"),
+  fullName: text("fullName"),
+  socialName: text("socialName"),
+  birthDate: text("birthDate"),
+  isPoliticallyExposedPerson: text("isPoliticallyExposedPerson"),
+  userExternalId: text("user_external_id").notNull(),
+});
+
+export const usersRelations = relations(users, ({ many }) => ({
+  accounts: many(accounts),
+}));
+
+export const address = pgTable("address", {
+  id: text("id").primaryKey(),
+  postalCode: text("postalCode"),
+  street: text("street"),
+  number: text("number"),
+  addressComplement: text("addressComplement"),
+  neighborhood: text("neighborhood"),
+  city: text("city"),
+  state: text("state"),
+  longitude: text("longitude"),
+  latitude: text("latitude"),
+  userId: text("user_id").notNull(),
+});
+
+export const addressRelations = relations(address, ({ one }) => ({
+  account: one(users, {
+    fields: [address.userId],
+    references: [users.id],
+  }),
+}));
+
 export const accounts = pgTable("accounts", {
   id: text("id").primaryKey(),
   plaidId: text("plaid_id"),
