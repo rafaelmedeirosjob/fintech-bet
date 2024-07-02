@@ -25,6 +25,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
 }));
 
+export const insertUserSchema = createInsertSchema(users);
+
 export const address = pgTable("address", {
   id: text("id").primaryKey(),
   postalCode: text("postalCode"),

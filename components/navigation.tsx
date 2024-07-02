@@ -28,7 +28,7 @@ const routes = [
   },
   {
     href: "/settings",
-    label: "Bancos",
+    label: "Configurações",
   },
 ];
 
