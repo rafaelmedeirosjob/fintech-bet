@@ -4,6 +4,7 @@ import { handle } from "hono/vercel";
 import plaid from "./plaid";
 import summary from "./summary";
 import accounts from "./accounts";
+import users from "./users";
 import categories from "./categories";
 import transactions from "./transactions";
 import subscriptions from "./subscriptions";
@@ -16,6 +17,7 @@ const routes = app
   .route("/plaid", plaid)
   .route("/summary", summary)
   .route("/accounts", accounts)
+  .route("/users", users)
   .route("/categories", categories)
   .route("/transactions", transactions)
   .route("/subscriptions", subscriptions)

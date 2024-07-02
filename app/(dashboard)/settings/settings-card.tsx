@@ -1,11 +1,7 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-
-import { PlaidConnect } from "@/features/plaid/components/plaid-connect";
-import { PlaidDisconnect } from "@/features/plaid/components/plaid-disconnect";
-import { useGetConnectedBank } from "@/features/plaid/api/use-get-connected-bank";
-
+import { Button } from "@/components/ui/button";
 import { useGetSubscription } from "@/features/subscriptions/api/use-get-subscription";
 import { SubscriptionCheckout } from "@/features/subscriptions/components/subscription-checkout";
 
@@ -18,18 +14,21 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { useNewUser } from "@/features/settings/hooks/use-new-user";
 
 export const SettingsCard = () => {
-  const {
-    data: connectedBank,
-    isLoading: isLoadingConnectedBank,
-  } = useGetConnectedBank();
+  // const {
+  //   data: connectedBank,
+  //   isLoading: isLoadingConnectedBank,
+  // } = useGetConnectedBank();
+  const newUser = useNewUser();
+  const userCreated = false;
   const {
     data: subscription,
     isLoading: isLoadingSubscription,
   } = useGetSubscription();
 
-  if (isLoadingConnectedBank || isLoadingSubscription) {
+  if (isLoadingSubscription) {
     return (
       <Card className="border-none drop-shadow-sm">
         <CardHeader>
@@ -50,35 +49,39 @@ export const SettingsCard = () => {
     <Card className="border-none drop-shadow-sm">
       <CardHeader>
         <CardTitle className="text-xl line-clamp-1">
-          Settings
+          Configurações
         </CardTitle>
       </CardHeader>
       <CardContent>
         <Separator />
         <div className="flex flex-col gap-y-2 lg:flex-row items-center py-4">
           <p className="text-sm font-medium w-full lg:w-[16.5rem]">
-            Bank account
+            Dados bancários
           </p>
           <div className="w-full flex items-center justify-between">
             <div className={cn(
               "text-sm truncate flex items-center",
-              !connectedBank && "text-muted-foreground",
+              !userCreated && "text-muted-foreground",
             )}>
-              {connectedBank
-                ? "Bank account connected"
-                : "No bank account connected"
+              {userCreated
+                ? "Dados atualizados, você pode efetuar o saque"
+                : "Realize o cadastro dos seus dados para fazer saques"
               }
             </div>
-            {connectedBank
-              ? <PlaidDisconnect />
-              : <PlaidConnect />
-            }
+            <Button
+              onClick={newUser.onOpen}
+              disabled={userCreated}
+              size="sm"
+              variant="ghost"
+            >
+              Preencher
+            </Button>
           </div>
         </div>
         <Separator />
         <div className="flex flex-col gap-y-2 lg:flex-row items-center py-4">
           <p className="text-sm font-medium w-full lg:w-[16.5rem]">
-            Subscription
+            Assinatura
           </p>
           <div className="w-full flex items-center justify-between">
             <div className={cn(
@@ -86,8 +89,8 @@ export const SettingsCard = () => {
               !subscription && "text-muted-foreground",
             )}>
               {subscription
-                ? `Subscription ${subscription.status}`
-                : "No subscription active"
+                ? `Inscrição ${subscription.status}`
+                : "Nenhuma inscrição está ativa"
               }
             </div>
             <SubscriptionCheckout />
