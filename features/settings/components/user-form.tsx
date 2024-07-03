@@ -167,7 +167,6 @@ export const UserForm = ({
                           disabled={disabled}
                           placeholder="Digite o seu email"
                           {...field}
-                          onChange={(e) => field.onChange(maskEmail(e.target.value))}
                           value={field.value ?? ""}
                         />
                       </FormControl>
@@ -314,6 +313,25 @@ export const UserForm = ({
                     </FormItem>
                   )}
                 />
+                                              <FormField
+                  name="neighborhood"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Bairro
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={disabled}
+                          placeholder="Digite o bairro"
+                          {...field}
+                          value={field.value ?? ""}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   name="number"
                   control={form.control}
@@ -324,8 +342,28 @@ export const UserForm = ({
                       </FormLabel>
                       <FormControl>
                         <Input
+                          type="number"
                           disabled={disabled}
                           placeholder="Digite o número"
+                          {...field}
+                          value={field.value ?? ""}
+                        />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+                                              <FormField
+                  name="addressComplement"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        Complemento
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          disabled={disabled}
+                          placeholder="Digite o complemento"
                           {...field}
                           value={field.value ?? ""}
                         />
@@ -371,31 +409,14 @@ export const UserForm = ({
                     </FormItem>
                   )}
                 />
+
               </div>
-              <FormField
-                  name="number"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>
-                        Número
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          disabled={disabled}
-                          placeholder="Digite o número"
-                          {...field}
-                          value={field.value ?? ""}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+
                 
             </Accordion.Content>
           </Accordion.Item>
 
-          {/* DADOS BANCÁRIOS */}
+          {/* DADOS BANCÁRIOS
           <Accordion.Item value="item-3"
             className='focus-within:shadow-mauve12 mt-px overflow-hidden first:mt-0 first:rounded-t last:rounded-b focus-within:relative focus-within:z-10 focus-within:shadow-[0_0_0_2px]'
           >
@@ -474,7 +495,7 @@ export const UserForm = ({
                 />
               </div>
             </Accordion.Content>
-          </Accordion.Item>
+          </Accordion.Item> */}
           <Button className="w-full" disabled={disabled}>
             {"Salvar alterações"}
           </Button>

@@ -2,8 +2,6 @@ import { z } from "zod";
 
 import { useNewUser } from "@/features/settings/hooks/use-new-user";
 import { useCreateUser } from "@/features/settings/api/use-create-user";
-
-import { insertUserSchema } from "@/db/schema";
 import {
   Sheet,
   SheetContent,
@@ -13,16 +11,23 @@ import {
 } from "@/components/ui/sheet";
 import { UserForm } from "./user-form";
 
-const formSchema = insertUserSchema.pick({
-  documentNumber: true,
-  phoneNumber: true,
-  fullName: true,
-  email: true,
-  motherName: true,
-  birthDate: true
-});
-
-type FormValues = z.input<typeof formSchema>;
+type FormValues = {
+  fullName: string;
+  documentNumber: string;
+  phoneNumber: string;
+  birthDate: string;
+  motherName: string;
+  email: string;
+  postalCode: string;
+  street: string;
+  number: string;
+  addressComplement: string;
+  neighborhood: string;
+  city: string;
+  state: string;
+  longitude: string;
+  latitude: string;
+};
 
 export const NewUserSheet = () => {
   const { isOpen, onClose } = useNewUser();

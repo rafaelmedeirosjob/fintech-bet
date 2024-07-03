@@ -6,7 +6,37 @@ import { zValidator } from "@hono/zod-validator";
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 
 import { db } from "@/db/drizzle";
-import { users, insertUserSchema } from "@/db/schema";
+import { address, users } from "@/db/schema";
+
+// Definição do schema combinado
+const insertUserSchema = z.object({
+  documentNumber: z.string().optional(),
+  phoneNumber: z.string().optional(),
+  fullName: z.string().optional(),
+  email: z.string().email().optional(),
+  motherName: z.string().optional(),
+  socialName: z.string().optional(),
+  birthDate: z.string().optional(),
+  isPoliticallyExposedPerson: z.string().optional(),
+});
+
+const insertAddressSchema = z.object({
+  postalCode: z.string().optional(),
+  street: z.string().optional(),
+  number: z.string().optional(),
+  addressComplement: z.string().optional(),
+  neighborhood: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  longitude: z.string().optional(),
+  latitude: z.string().optional(),
+});
+
+// Schema combinado
+const combinedSchema = z.object({
+  ...insertUserSchema.shape,
+  ...insertAddressSchema.shape,
+});
 
 const app = new Hono()
   .get(
@@ -93,16 +123,7 @@ const app = new Hono()
   .post(
     "/",
     clerkMiddleware(),
-    zValidator("json", insertUserSchema.pick({
-      documentNumber: true,
-      phoneNumber: true,
-      fullName: true,
-      email: true,
-      motherName: true,
-      socialName: true,
-      birthDate: true,
-      isPoliticallyExposedPerson: true
-    })),
+    zValidator("json", combinedSchema),
     async (c) => {
       const auth = getAuth(c);
       const values = c.req.valid("json");
@@ -110,12 +131,39 @@ const app = new Hono()
       if (!auth?.userId) {
         return c.json({ error: "Unauthorized" }, 401);
       }
-
+      console.log('Saving users data...');
       const [data] = await db.insert(users).values({
         id: createId(),
         userExternalId: auth.userId,
-        ...values,
+        documentNumber: values.documentNumber,
+        phoneNumber: values.phoneNumber,
+        fullName: values.fullName,
+        email: values.email,
+        motherName: values.motherName,
+        socialName: values.socialName,
+        birthDate: values.birthDate,
+        isPoliticallyExposedPerson: "false"
+
       }).returning();
+      
+      console.log(data)
+      console.log('Saving address data...');
+      const [data1] = await db.insert(address).values({
+        id: createId(),
+        postalCode: values.postalCode,
+        street: values.number,
+        number: values.number,
+        addressComplement: values.addressComplement,
+        neighborhood: values.neighborhood,
+        city: values.city,
+        state: values.state,
+        longitude: values.longitude,
+        latitude: values.latitude,
+        userId: data.id
+      }).returning();
+
+      console.log(data1)
+
 
       return c.json({ data });
   })
@@ -130,16 +178,7 @@ const app = new Hono()
     ),
     zValidator(
       "json",
-      insertUserSchema.pick({
-        documentNumber: true,
-        phoneNumber: true,
-        fullName: true,
-        email: true,
-        motherName: true,
-        socialName: true,
-        birthDate: true,
-        isPoliticallyExposedPerson: true
-      })
+      combinedSchema
     ),
     async (c) => {
       const auth = getAuth(c);

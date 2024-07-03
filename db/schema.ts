@@ -18,21 +18,14 @@ export const users = pgTable("users", {
   fullName: text("fullName"),
   socialName: text("socialName"),
   birthDate: text("birthDate"),
-  addressId: text("address_id").references(() => address.id, {
-    onDelete: "cascade",
-  }),
   isPoliticallyExposedPerson: text("isPoliticallyExposedPerson"),
   userExternalId: text("user_external_id").notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at'),
 });
 
-export const usersRelations = relations(users, ({ many, one }) => ({
-  accounts: many(accounts),
-  address: one(address, {
-    fields: [users.addressId],
-    references: [address.id],
-  }),
+export const usersRelations = relations(users, ({ many }) => ({
+  accounts: many(accounts)
 }));
 
 export const insertUserSchema = createInsertSchema(users);
@@ -48,11 +41,13 @@ export const address = pgTable("address", {
   state: text("state"),
   longitude: text("longitude"),
   latitude: text("latitude"),
-  userId: text("user_id").notNull(),
+  userId: text("user_id").references(() => users.id, {
+    onDelete: "cascade",
+  }),
 });
 
 export const addressRelations = relations(address, ({ one }) => ({
-  address: one(users, {
+  user: one(users, {
     fields: [address.userId],
     references: [users.id],
   }),

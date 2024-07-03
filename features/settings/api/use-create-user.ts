@@ -20,11 +20,11 @@ export const useCreateUser = () => {
       return await response.json();
     },
     onSuccess: () => {
-      toast.success("User created");
+      toast.success("Seu cadastro foi atualizado com sucesso");
       queryClient.invalidateQueries({ queryKey: ["users"] });
     },
     onError: () => {
-      toast.error("Failed to create account");
+      toast.error("Falha ao atualizar seu cadastro");
     },
   });
 
