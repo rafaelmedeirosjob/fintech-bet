@@ -10,23 +10,6 @@ import { users, insertUserSchema } from "@/db/schema";
 
 const app = new Hono()
   .get(
-    "/",
-    clerkMiddleware(),
-    async (c) => {
-      const auth = getAuth(c);
-
-      if (!auth?.userId) {
-        return c.json({ error: "Unauthorized" }, 401);
-      }
-
-      const data = await db
-        .select()
-        .from(users)
-        .where(eq(users.userExternalId, auth.userId));
-
-      return c.json({ data });
-  })
-  .get(
     "/:id",
     zValidator("param", z.object({
       id: z.string().optional(),
@@ -35,11 +18,11 @@ const app = new Hono()
     async (c) => {
       const auth = getAuth(c);
       const { id } = c.req.valid("param");
-
+      
       if (!id) {
         return c.json({ error: "Missing id" }, 400);
       }
-      
+
       if (!auth?.userId) {
         return c.json({ error: "Unauthorized" }, 401);
       }
@@ -50,6 +33,11 @@ const app = new Hono()
           documentNumber: users.documentNumber,
           phoneNumber: users.phoneNumber,
           fullName: users.fullName,
+          email: users.email,
+          motherName: users.motherName,
+          socialName: users.socialName,
+          birthDate: users.birthDate,
+          isPoliticallyExposedPerson: users.isPoliticallyExposedPerson
         })
         .from(users)
         .where(
@@ -66,15 +54,59 @@ const app = new Hono()
       return c.json({ data });
     }
   )
+  .get(
+    "/main",
+    clerkMiddleware(),
+    async (c) => {
+      const auth = getAuth(c);
+      
+      if (!auth?.userId) {
+        return c.json({ error: "Unauthorized" }, 401);
+      }
+
+      const [data] = await db
+        .select({
+          id: users.id,
+          documentNumber: users.documentNumber,
+          phoneNumber: users.phoneNumber,
+          fullName: users.fullName,
+          email: users.email,
+          motherName: users.motherName,
+          socialName: users.socialName,
+          birthDate: users.birthDate,
+          isPoliticallyExposedPerson: users.isPoliticallyExposedPerson
+        })
+        .from(users)
+        .where(
+          and(
+            eq(users.userExternalId, auth.userId)
+          ),
+        );
+      
+      if (!data) {
+        return c.json({ error: "Not found" }, 404);
+      }
+
+      return c.json({ data });
+    }
+  )
   .post(
     "/",
     clerkMiddleware(),
     zValidator("json", insertUserSchema.pick({
+      documentNumber: true,
+      phoneNumber: true,
+      fullName: true,
+      email: true,
+      motherName: true,
+      socialName: true,
+      birthDate: true,
+      isPoliticallyExposedPerson: true
     })),
     async (c) => {
       const auth = getAuth(c);
       const values = c.req.valid("json");
-
+      console.log(auth)
       if (!auth?.userId) {
         return c.json({ error: "Unauthorized" }, 401);
       }
@@ -99,6 +131,14 @@ const app = new Hono()
     zValidator(
       "json",
       insertUserSchema.pick({
+        documentNumber: true,
+        phoneNumber: true,
+        fullName: true,
+        email: true,
+        motherName: true,
+        socialName: true,
+        birthDate: true,
+        isPoliticallyExposedPerson: true
       })
     ),
     async (c) => {

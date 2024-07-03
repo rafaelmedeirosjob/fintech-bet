@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useNewUser } from "@/features/settings/hooks/use-new-user";
+import { useGetUser } from "@/features/settings/api/use-get-user";
 
 export const SettingsCard = () => {
   // const {
@@ -22,7 +23,10 @@ export const SettingsCard = () => {
   //   isLoading: isLoadingConnectedBank,
   // } = useGetConnectedBank();
   const newUser = useNewUser();
-  const userCreated = false;
+  const {
+    data: userCreated,
+    isLoading: isLoadingUser,
+  } = useGetUser();
   const {
     data: subscription,
     isLoading: isLoadingSubscription,
@@ -56,7 +60,7 @@ export const SettingsCard = () => {
         <Separator />
         <div className="flex flex-col gap-y-2 lg:flex-row items-center py-4">
           <p className="text-sm font-medium w-full lg:w-[16.5rem]">
-            Dados bancários
+            Dados pessoais e bancários
           </p>
           <div className="w-full flex items-center justify-between">
             <div className={cn(
@@ -70,7 +74,7 @@ export const SettingsCard = () => {
             </div>
             <Button
               onClick={newUser.onOpen}
-              disabled={userCreated}
+              disabled={userCreated != null}
               size="sm"
               variant="ghost"
             >

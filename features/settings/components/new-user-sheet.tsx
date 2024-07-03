@@ -16,7 +16,10 @@ import { UserForm } from "./user-form";
 const formSchema = insertUserSchema.pick({
   documentNumber: true,
   phoneNumber: true,
-  fullName: true
+  fullName: true,
+  email: true,
+  motherName: true,
+  birthDate: true
 });
 
 type FormValues = z.input<typeof formSchema>;
@@ -39,7 +42,7 @@ export const NewUserSheet = () => {
       <SheetContent className="space-y-4">
         <SheetHeader>
           <SheetTitle>
-            Dados do usuário
+            Preencha todos os seus dados
           </SheetTitle>
           <SheetDescription>
             Insira seus dados abaixo para realizar transações dentro da plataforma
@@ -51,7 +54,19 @@ export const NewUserSheet = () => {
           defaultValues={{
             documentNumber: "",
             fullName: "",
-            phoneNumber: ""
+            phoneNumber: "",
+            motherName: "",
+            email: "",
+            birthDate: "",
+            postalCode: "",
+            street: "",
+            addressComplement: "",
+            number: "",
+            neighborhood: "",
+            city: "",
+            state: "",
+            longitude: "",
+            latitude: "",
           }}
         />
       </SheetContent>
