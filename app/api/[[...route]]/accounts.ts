@@ -6,7 +6,38 @@ import { zValidator } from "@hono/zod-validator";
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 
 import { db } from "@/db/drizzle";
-import { accounts, insertAccountSchema } from "@/db/schema";
+import { accounts, insertAccountSchema, person, users, address } from "@/db/schema";
+
+// Definição do schema combinado
+const insertPersonSchema = z.object({
+  documentNumber: z.string().optional(),
+  phoneNumber: z.string().optional(),
+  fullName: z.string().optional(),
+  email: z.string().email().optional(),
+  motherName: z.string().optional(),
+  socialName: z.string().optional(),
+  birthDate: z.string().optional(),
+  isPoliticallyExposedPerson: z.string().optional(),
+});
+
+const insertAddressSchema = z.object({
+  postalCode: z.string().optional(),
+  street: z.string().optional(),
+  number: z.string().optional(),
+  addressComplement: z.string().optional(),
+  neighborhood: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  longitude: z.string().optional(),
+  latitude: z.string().optional(),
+});
+
+// Schema combinado
+const combinedSchema = z.object({
+  ...insertPersonSchema.shape,
+  ...insertAddressSchema.shape,
+});
+
 
 const app = new Hono()
   .get(
@@ -22,13 +53,15 @@ const app = new Hono()
       const data = await db
         .select({
           id: accounts.id,
-          name: accounts.name,
+          documentNumber: accounts.documentNumber,
         })
         .from(accounts)
-        .where(eq(accounts.userId, auth.userId));
+        .leftJoin(person, eq(person.id, accounts.personId))
+        .leftJoin(users, eq(users.id, person.userId))
+        .where(eq(users.userExternalId, auth.userId));
 
       return c.json({ data });
-  })
+    })
   .get(
     "/:id",
     zValidator("param", z.object({
@@ -42,7 +75,7 @@ const app = new Hono()
       if (!id) {
         return c.json({ error: "Missing id" }, 400);
       }
-      
+
       if (!auth?.userId) {
         return c.json({ error: "Unauthorized" }, 401);
       }
@@ -50,16 +83,18 @@ const app = new Hono()
       const [data] = await db
         .select({
           id: accounts.id,
-          name: accounts.name,
+          documentNumber: accounts.documentNumber,
         })
         .from(accounts)
+        .leftJoin(person, eq(person.id, accounts.personId))
+        .leftJoin(users, eq(users.id, person.userId))
         .where(
           and(
-            eq(accounts.userId, auth.userId),
+            eq(users.userExternalId, auth.userId),
             eq(accounts.id, id)
           ),
         );
-      
+
       if (!data) {
         return c.json({ error: "Not found" }, 404);
       }
@@ -70,9 +105,7 @@ const app = new Hono()
   .post(
     "/",
     clerkMiddleware(),
-    zValidator("json", insertAccountSchema.pick({
-      name: true,
-    })),
+    zValidator("json", combinedSchema),
     async (c) => {
       const auth = getAuth(c);
       const values = c.req.valid("json");
@@ -81,14 +114,49 @@ const app = new Hono()
         return c.json({ error: "Unauthorized" }, 401);
       }
 
-      const [data] = await db.insert(accounts).values({
+      const [dataAddress] = await db.insert(address).values({
         id: createId(),
-        userId: auth.userId,
-        ...values,
+        postalCode: values.postalCode,
+        street: values.number,
+        number: values.number,
+        addressComplement: values.addressComplement,
+        neighborhood: values.neighborhood,
+        city: values.city,
+        state: values.state,
+        longitude: values.longitude,
+        latitude: values.latitude
       }).returning();
 
-      return c.json({ data });
-  })
+      console.log('Saving users data...');
+      const [dataPerson] = await db.insert(person).values({
+        id: createId(),
+        userExternalId: auth.userId,
+        documentNumber: values.documentNumber,
+        phoneNumber: values.phoneNumber,
+        fullName: values.fullName,
+        email: values.email,
+        motherName: values.motherName,
+        socialName: values.socialName,
+        birthDate: values.birthDate,
+        isPoliticallyExposedPerson: "false",
+        userId: null,
+        addressId: dataAddress.id
+      }).returning();
+
+      const [dataAccount] = await db.insert(accounts).values({
+        id: createId(),
+        status: "PROCESSING",
+        documentNumber: "",
+        participant: "",
+        accountOnboardingType: "",
+        branch: "",
+        account: "",
+        accountType: "",
+        personId: dataPerson.id
+      }).returning();
+
+      return c.json({ dataAccount });
+    })
   .post(
     "/bulk-delete",
     clerkMiddleware(),
@@ -110,7 +178,6 @@ const app = new Hono()
         .delete(accounts)
         .where(
           and(
-            eq(accounts.userId, auth.userId),
             inArray(accounts.id, values.ids)
           )
         )
@@ -133,7 +200,7 @@ const app = new Hono()
     zValidator(
       "json",
       insertAccountSchema.pick({
-        name: true,
+        documentNumber: true,
       })
     ),
     async (c) => {
@@ -154,7 +221,6 @@ const app = new Hono()
         .set(values)
         .where(
           and(
-            eq(accounts.userId, auth.userId),
             eq(accounts.id, id),
           ),
         )
@@ -192,7 +258,6 @@ const app = new Hono()
         .delete(accounts)
         .where(
           and(
-            eq(accounts.userId, auth.userId),
             eq(accounts.id, id),
           ),
         )

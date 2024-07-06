@@ -14,25 +14,22 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useNewUser } from "@/features/settings/hooks/use-new-user";
-import { useGetUser } from "@/features/settings/api/use-get-user";
+import { useOpenUser } from "@/features/settings/hooks/use-open-user";
+import { useGetUserMain } from "@/features/settings/api/use-get-user-main";
 
 export const SettingsCard = () => {
-  // const {
-  //   data: connectedBank,
-  //   isLoading: isLoadingConnectedBank,
-  // } = useGetConnectedBank();
-  const newUser = useNewUser();
+  const { onOpen } = useOpenUser();
   const {
     data: userCreated,
     isLoading: isLoadingUser,
-  } = useGetUser();
+  } = useGetUserMain();
+  console.log(userCreated)
   const {
     data: subscription,
     isLoading: isLoadingSubscription,
   } = useGetSubscription();
 
-  if (isLoadingSubscription) {
+  if (isLoadingSubscription || isLoadingUser) {
     return (
       <Card className="border-none drop-shadow-sm">
         <CardHeader>
@@ -73,8 +70,8 @@ export const SettingsCard = () => {
               }
             </div>
             <Button
-              onClick={newUser.onOpen}
-              disabled={userCreated != null}
+              onClick={() => onOpen(userCreated)}
+              disabled={false}
               size="sm"
               variant="ghost"
             >

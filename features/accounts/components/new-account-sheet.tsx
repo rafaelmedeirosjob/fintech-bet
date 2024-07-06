@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/sheet";
 
 const formSchema = insertAccountSchema.pick({
-  name: true,
+  documentNumber: true,
 });
 
 type FormValues = z.input<typeof formSchema>;
@@ -47,7 +47,7 @@ export const NewAccountSheet = () => {
           onSubmit={onSubmit} 
           disabled={mutation.isPending}
           defaultValues={{
-            name: "",
+            documentNumber: "",
           }}
         />
       </SheetContent>

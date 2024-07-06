@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/sheet";
 
 const formSchema = insertAccountSchema.pick({
-  name: true,
+  documentNumber: true,
 });
 
 type FormValues = z.input<typeof formSchema>;
@@ -67,9 +67,9 @@ export const EditAccountSheet = () => {
   };
 
   const defaultValues = accountQuery.data ? {
-    name: accountQuery.data.name
+    documentNumber: accountQuery.data.documentNumber
   } : {
-    name: "",
+    documentNumber: "",
   };
 
   return (
@@ -79,7 +79,7 @@ export const EditAccountSheet = () => {
         <SheetContent className="space-y-4">
           <SheetHeader>
             <SheetTitle>
-              Edit Account
+              Editar conta
             </SheetTitle>
             <SheetDescription>
               Edit an existing account

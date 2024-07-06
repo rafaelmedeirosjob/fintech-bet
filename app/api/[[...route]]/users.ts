@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { number, z } from "zod";
 import { Hono } from "hono";
 import { and, eq, inArray } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
@@ -6,7 +6,9 @@ import { zValidator } from "@hono/zod-validator";
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 
 import { db } from "@/db/drizzle";
-import { address, users } from "@/db/schema";
+import { address, users, person } from "@/db/schema";
+import { Citrus } from "lucide-react";
+import { FaCity } from "react-icons/fa";
 
 // Definição do schema combinado
 const insertUserSchema = z.object({
@@ -40,52 +42,7 @@ const combinedSchema = z.object({
 
 const app = new Hono()
   .get(
-    "/:id",
-    zValidator("param", z.object({
-      id: z.string().optional(),
-    })),
-    clerkMiddleware(),
-    async (c) => {
-      const auth = getAuth(c);
-      const { id } = c.req.valid("param");
-      
-      if (!id) {
-        return c.json({ error: "Missing id" }, 400);
-      }
-
-      if (!auth?.userId) {
-        return c.json({ error: "Unauthorized" }, 401);
-      }
-
-      const [data] = await db
-        .select({
-          id: users.id,
-          documentNumber: users.documentNumber,
-          phoneNumber: users.phoneNumber,
-          fullName: users.fullName,
-          email: users.email,
-          motherName: users.motherName,
-          socialName: users.socialName,
-          birthDate: users.birthDate,
-          isPoliticallyExposedPerson: users.isPoliticallyExposedPerson
-        })
-        .from(users)
-        .where(
-          and(
-            eq(users.userExternalId, auth.userId),
-            eq(users.id, id)
-          ),
-        );
-      
-      if (!data) {
-        return c.json({ error: "Not found" }, 404);
-      }
-
-      return c.json({ data });
-    }
-  )
-  .get(
-    "/main",
+    "/",
     clerkMiddleware(),
     async (c) => {
       const auth = getAuth(c);
@@ -93,26 +50,35 @@ const app = new Hono()
       if (!auth?.userId) {
         return c.json({ error: "Unauthorized" }, 401);
       }
-
+      console.log("ola")
+      console.log(auth)
       const [data] = await db
         .select({
           id: users.id,
-          documentNumber: users.documentNumber,
-          phoneNumber: users.phoneNumber,
-          fullName: users.fullName,
+          documentNumber: person.documentNumber,
+          phoneNumber: person.phoneNumber,
+          fullName: person.fullName,
           email: users.email,
-          motherName: users.motherName,
-          socialName: users.socialName,
-          birthDate: users.birthDate,
-          isPoliticallyExposedPerson: users.isPoliticallyExposedPerson
+          motherName: person.motherName,
+          socialName: person.socialName,
+          birthDate: person.birthDate,
+          isPoliticallyExposedPerson: person.isPoliticallyExposedPerson,
+          postalCode: address.postalCode,
+          street: address.street,
+          addressComplement: address.addressComplement,
+          number: address.number,
+          neighborhood: address.neighborhood,
+          city: address.city,
+          state: address.state
         })
         .from(users)
+        .leftJoin(person, eq(users.id, person.userId))
+        .leftJoin(address, eq(person.addressId, address.id))
         .where(
           and(
             eq(users.userExternalId, auth.userId)
           ),
         );
-      
       if (!data) {
         return c.json({ error: "Not found" }, 404);
       }
@@ -131,23 +97,18 @@ const app = new Hono()
       if (!auth?.userId) {
         return c.json({ error: "Unauthorized" }, 401);
       }
-      console.log('Saving users data...');
-      const [data] = await db.insert(users).values({
-        id: createId(),
-        userExternalId: auth.userId,
-        documentNumber: values.documentNumber,
-        phoneNumber: values.phoneNumber,
-        fullName: values.fullName,
-        email: values.email,
-        motherName: values.motherName,
-        socialName: values.socialName,
-        birthDate: values.birthDate,
-        isPoliticallyExposedPerson: "false"
 
+      console.log('Saving user data...');
+      const [data2] = await db.insert(users).values({
+        id: createId(),
+        email: values.email,
+        emailVerified: "true",
+        image: "",
+        password: "",
+        role: "user",
+        userExternalId: auth.userId
       }).returning();
-      
-      console.log(data)
-      console.log('Saving address data...');
+
       const [data1] = await db.insert(address).values({
         id: createId(),
         postalCode: values.postalCode,
@@ -158,11 +119,31 @@ const app = new Hono()
         city: values.city,
         state: values.state,
         longitude: values.longitude,
-        latitude: values.latitude,
-        userId: data.id
+        latitude: values.latitude
       }).returning();
 
+      console.log('Saving users data...');
+      const [data] = await db.insert(person).values({
+        id: createId(),
+        userExternalId: auth.userId,
+        documentNumber: values.documentNumber,
+        phoneNumber: values.phoneNumber,
+        fullName: values.fullName,
+        email: values.email,
+        motherName: values.motherName,
+        socialName: values.socialName,
+        birthDate: values.birthDate,
+        isPoliticallyExposedPerson: "false",
+        userId: data2.id,
+        addressId: data1.id
+      }).returning();
+      
+      console.log(data)
+
+
       console.log(data1)
+
+      console.log(data2)
 
 
       return c.json({ data });
@@ -194,13 +175,37 @@ const app = new Hono()
       }
 
       const [data] = await db
-        .update(users)
-        .set(values)
+        .update(person)
+        .set({
+          documentNumber: values.documentNumber,
+          email: values.email,
+          phoneNumber: values.phoneNumber,
+          motherName: values.motherName,
+          fullName: values.fullName,
+          socialName: values.socialName,
+          birthDate: values.birthDate,
+        })
         .where(
           and(
-            eq(users.userExternalId, auth.userId),
-            eq(users.id, id),
+            eq(person.userId, id)
           ),
+        )
+        .returning();
+
+        const addressId = data.addressId;
+        const [data2] = await db
+        .update(address)
+        .set({
+          postalCode: values.postalCode,
+          street: values.street,
+          number: values.number,
+          addressComplement: values.addressComplement,
+          neighborhood: values.neighborhood,
+          city: values.city,
+          state: values.state,
+        })
+        .where(
+            eq(address.id, addressId)     
         )
         .returning();
 
@@ -208,7 +213,8 @@ const app = new Hono()
         return c.json({ error: "Not found" }, 404);
       }
 
-      return c.json({ data });
+
+      return c.json({});
     },
   )
   .delete(

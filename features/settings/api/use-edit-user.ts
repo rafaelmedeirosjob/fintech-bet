@@ -23,14 +23,14 @@ export const useEditUser = (id?: string) => {
       return await response.json();
     },
     onSuccess: () => {
-      toast.success("User updated");
-      queryClient.invalidateQueries({ queryKey: ["user", { id }] });
+      toast.success("Seu cadastro foi atualizado com sucesso");
+      queryClient.invalidateQueries({ queryKey: ["account", { id }] });
       queryClient.invalidateQueries({ queryKey: ["users"] });
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
       queryClient.invalidateQueries({ queryKey: ["summary"] });
     },
     onError: () => {
-      toast.error("Failed to edit user");
+      toast.error("Falha ao atualizar seu cadastro");
     },
   });
 
