@@ -72,7 +72,7 @@ export const AccountFilter = () => {
         </SelectItem>
         {accounts?.map((account) => (
           <SelectItem key={account.id} value={account.id}>
-            {account.name}
+            {account.documentNumber}
           </SelectItem>
         ))}
       </SelectContent>

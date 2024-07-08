@@ -105,6 +105,7 @@ export const address = pgTable("address", {
   latitude: text("latitude")
 });
 
+
 export const insertAddress = createInsertSchema(address);
 
 export const accounts = pgTable("accounts", {

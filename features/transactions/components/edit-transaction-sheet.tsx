@@ -53,11 +53,11 @@ export const EditTransactionSheet = () => {
 
   const accountQuery = useGetAccounts();
   const accountMutation = useCreateAccount();
-  const onCreateAccount = (name: string) => accountMutation.mutate({
-    name
+  const onCreateAccount = (documentNumber: string) => accountMutation.mutate({
+    documentNumber
   });
   const accountOptions = (accountQuery.data ?? []).map((account) => ({
-    label: account.name,
+    label: account.documentNumber,
     value: account.id,
   }));
 

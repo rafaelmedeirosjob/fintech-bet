@@ -191,8 +191,7 @@ const app = new Hono()
           ),
         )
         .returning();
-
-        const addressId = data.addressId;
+        const addressId = data.addressId == null ? "" : data.addressId;
         const [data2] = await db
         .update(address)
         .set({
@@ -205,7 +204,9 @@ const app = new Hono()
           state: values.state,
         })
         .where(
-            eq(address.id, addressId)     
+          and(
+            eq(address.id, addressId)
+          )
         )
         .returning();
 
