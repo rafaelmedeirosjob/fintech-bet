@@ -9,6 +9,8 @@ import { and, desc, eq, gte, inArray, lte, sql } from "drizzle-orm";
 import { db } from "@/db/drizzle";
 import { 
   transactions, 
+  person,
+  users,
   insertTransactionSchema, 
   categories,
   accounts
@@ -50,16 +52,17 @@ const app = new Hono()
           payee: transactions.payee,
           amount: transactions.amount,
           notes: transactions.notes,
-          account: accounts.name,
+          account: accounts.documentNumber,
           accountId: transactions.accountId,
         })
         .from(transactions)
         .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+        .innerJoin(person, eq(accounts.personId, person.id))
         .leftJoin(categories, eq(transactions.categoryId, categories.id))
         .where(
           and(
             accountId ? eq(transactions.accountId, accountId) : undefined,
-            eq(accounts.userId, auth.userId),
+            eq(person.userExternalId, auth.userId),
             gte(transactions.date, startDate),
             lte(transactions.date, endDate),
           )
@@ -98,10 +101,11 @@ const app = new Hono()
         })
         .from(transactions)
         .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+        .innerJoin(person, eq(accounts.personId, person.id))
         .where(
           and(
             eq(transactions.id, id),
-            eq(accounts.userId, auth.userId),
+            eq(person.userExternalId, auth.userId),
           ),
         );
       
@@ -185,9 +189,10 @@ const app = new Hono()
       const transactionsToDelete = db.$with("transactions_to_delete").as(
         db.select({ id: transactions.id }).from(transactions)
           .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+          .innerJoin(person, eq(accounts.personId, person.id))
           .where(and(
             inArray(transactions.id, values.ids),
-            eq(accounts.userId, auth.userId),
+            eq(person.userId, auth.userId),
           )),
       );
 
@@ -236,9 +241,10 @@ const app = new Hono()
         db.select({ id: transactions.id })
           .from(transactions)
           .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+          .innerJoin(person, eq(accounts.personId, person.id))
           .where(and(
             eq(transactions.id, id),
-            eq(accounts.userId, auth.userId),
+            eq(person.userExternalId, auth.userId),
           )),
       );
 
@@ -284,9 +290,10 @@ const app = new Hono()
         db.select({ id: transactions.id })
           .from(transactions)
           .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+          .innerJoin(person, eq(accounts.personId, person.id))
           .where(and(
             eq(transactions.id, id),
-            eq(accounts.userId, auth.userId),
+            eq(person.userExternalId, auth.userId),
           )),
       );
 

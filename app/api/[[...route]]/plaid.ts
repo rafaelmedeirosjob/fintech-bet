@@ -57,53 +57,6 @@ const app = new Hono()
       return c.json({ data: connectedBank || null });
     },
   )
-  .delete(
-    "/connected-bank",
-    clerkMiddleware(),
-    async (c) => {
-      const auth = getAuth(c);
-
-      if (!auth?.userId) {
-        return c.json({ error: "Unauthorized" }, 401);
-      }
-
-      const [connectedBank] = await db
-        .delete(connectedBanks)
-        .where(
-          eq(
-            connectedBanks.userId,
-            auth.userId,
-          ),
-        )
-        .returning({
-          id: connectedBanks.id,
-        });
-
-      if (!connectedBank) {
-        return c.json({ error: "Not found" }, 404);
-      }
-
-      await db
-        .delete(accounts)
-        .where(
-          and(
-            eq(accounts.userId, auth.userId),
-            isNotNull(accounts.plaidId),
-          ),
-        );
-
-      await db
-        .delete(categories)
-        .where(
-          and(
-            eq(categories.userId, auth.userId),
-            isNotNull(categories.plaidId),
-          ),
-        );
-
-      return c.json({ data: connectedBank });
-    },
-  )
   .post(
     "/create-link-token",
     clerkMiddleware(),
@@ -172,7 +125,7 @@ const app = new Hono()
         .values(
           plaidAccounts.data.accounts.map((account) => ({
             id: createId(),
-            name: account.name,
+            documentNumber: account.name,
             plaidId: account.account_id,
             userId: auth.userId,
           })),
@@ -194,7 +147,7 @@ const app = new Hono()
       const newTransactionsValues = plaidTransactions.data.added
         .reduce((acc, transaction) => {
           const account = newAccounts
-            .find((account) => account.plaidId === transaction.account_id);
+            .find((account) => account.id === transaction.account_id);
           const category = newCategories
             .find((category) => category.plaidId === transaction.category_id);
           const amountInMiliunits = convertAmountToMiliunits(
