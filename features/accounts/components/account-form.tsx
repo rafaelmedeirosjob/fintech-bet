@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/form";
 
 const formSchema = insertAccountSchema.pick({
-  name: true,
+  documentNumber: true,
 });
 
 type FormValues = z.input<typeof formSchema>;
@@ -56,12 +56,12 @@ export const AccountForm = ({
         className="space-y-4 pt-4"
       >
         <FormField
-          name="name"
+          name="documentNumber"
           control={form.control}
           render={({ field }) => (
             <FormItem>
               <FormLabel>
-              Nome
+              Cpf
               </FormLabel>
               <FormControl>
                 <Input

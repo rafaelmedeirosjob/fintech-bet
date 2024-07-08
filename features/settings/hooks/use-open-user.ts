@@ -1,15 +1,15 @@
 import { create } from "zustand";
 
 type OpenUserState = {
-  id?: string;
+  user?: any;
   isOpen: boolean;
-  onOpen: (id: string) => void;
+  onOpen: (id: any) => void;
   onClose: () => void;
 };
 
 export const useOpenUser = create<OpenUserState>((set) => ({
-  id: undefined,
+  user: undefined,
   isOpen: false,
-  onOpen: (id: string) => set({ isOpen: true, id }),
-  onClose: () => set({ isOpen: false, id: undefined }),
+  onOpen: (user: any) => set({ isOpen: true, user }),
+  onClose: () => set({ isOpen: false, user: undefined }),
 }));

@@ -5,11 +5,59 @@ import {
   integer, 
   pgTable, 
   text, 
-  boolean,
+  pgEnum,
   timestamp,
 } from "drizzle-orm/pg-core";
 
+export const RoleEnum = pgEnum('user', ['user', 'admin', 'user-admin']);
+
 export const users = pgTable("users", {
+  id: text("id").primaryKey(),
+  email: text("email"),
+  emailVerified: text("emailVerified"),
+  image: text("image"),
+  password: text("password"),
+  role: RoleEnum('user'),
+  userExternalId: text("user_external_id").notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at'),
+});
+
+export const usersRelations = relations(users, ({ many }) => ({
+  auth: many(auth),
+}));
+
+export const insertUserSchema = createInsertSchema(users);
+
+export const auth = pgTable("auth", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").references(() => users.id, {
+    onDelete: "cascade",
+  }),
+  type: text("type"),
+  provider: text("provider"),
+  providerAccountId: text("providerAccountId"),
+  refresh_token: RoleEnum('refresh_token'),
+  access_token: text("access_token").notNull(),
+  expires_at: text("expires_at").notNull(),
+  token_type: text("token_type").notNull(),
+  scope: text("scope").notNull(),
+  id_token: text("id_token").notNull(),
+  session_state: text("session_state").notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at'),
+});
+
+export const authRelations = relations(auth, ({ one }) => ({
+  user: one(users, {
+    fields: [auth.userId],
+    references: [users.id],
+  }),
+}));
+
+export const insertAuthSchema = createInsertSchema(auth);
+
+export const person = pgTable("person", {
   id: text("id").primaryKey(),
   documentNumber: text("documentNumber"),
   phoneNumber: text("phoneNumber"),
@@ -20,15 +68,29 @@ export const users = pgTable("users", {
   birthDate: text("birthDate"),
   isPoliticallyExposedPerson: text("isPoliticallyExposedPerson"),
   userExternalId: text("user_external_id").notNull(),
+  userId: text("user_id").references(() => users.id, {
+    onDelete: "cascade",
+  }),
+  addressId: text("address_id").references(() => address.id, {
+    onDelete: "cascade",
+  }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at'),
 });
 
-export const usersRelations = relations(users, ({ many }) => ({
-  accounts: many(accounts)
+export const personRelations = relations(person, ({ many, one }) => ({
+  accounts: many(accounts),
+  user: one(users, {
+    fields: [person.userId],
+    references: [users.id],
+  }),
+  address: one(address, {
+    fields: [person.addressId],
+    references: [address.id],
+  }),
 }));
 
-export const insertUserSchema = createInsertSchema(users);
+export const insertPersonSchema = createInsertSchema(person);
 
 export const address = pgTable("address", {
   id: text("id").primaryKey(),
@@ -40,29 +102,22 @@ export const address = pgTable("address", {
   city: text("city"),
   state: text("state"),
   longitude: text("longitude"),
-  latitude: text("latitude"),
-  userId: text("user_id").references(() => users.id, {
-    onDelete: "cascade",
-  }),
+  latitude: text("latitude")
 });
 
-export const addressRelations = relations(address, ({ one }) => ({
-  user: one(users, {
-    fields: [address.userId],
-    references: [users.id],
-  }),
-}));
 
 export const insertAddress = createInsertSchema(address);
 
 export const accounts = pgTable("accounts", {
   id: text("id").primaryKey(),
-  plaidId: text("plaid_id"),
-  name: text("name").notNull(),
-  userId: text("user_id").references(() => users.id, {
-    onDelete: "cascade",
-  }).notNull(),
-  userAccountId: text("user_account_id").references(() => usersAccount.id, {
+  status: text("status"),
+  documentNumber: text("documentNumber").notNull(),
+  participant: text("participant"),
+  accountOnboardingType: text("accountOnboardingType"),
+  branch: text("branch"),
+  account: text("account"),
+  accountType: text("accountType"),
+  personId: text("person_id").references(() => person.id, {
     onDelete: "cascade",
   }),
   createdAt: timestamp('created_at').notNull().defaultNow(),
@@ -71,13 +126,9 @@ export const accounts = pgTable("accounts", {
 
 export const accountsRelations = relations(accounts, ({ many, one }) => ({
   transactions: many(transactions),
-  users: one(users, {
-    fields: [accounts.userId],
-    references: [users.id],
-  }),
-  user_account: one(usersAccount, {
-    fields: [accounts.userAccountId],
-    references: [usersAccount.id],
+  person: one(person, {
+    fields: [accounts.personId],
+    references: [person.id],
   }),
 }));
 
@@ -137,37 +188,3 @@ export const subscriptions = pgTable("subscriptions", {
   subscriptionId: text("subscription_id").notNull().unique(),
   status: text("status").notNull(),
 });
-
-
-export const usersAccount = pgTable("users_account", {
-  id: text("id").primaryKey(),
-  documentNumber: text("documentNumber"),
-  phoneNumber: text("phoneNumber"),
-  email: text("email"),
-  motherName: text("motherName"),
-  fullName: text("fullName"),
-  socialName: text("socialName"),
-  birthDate: text("birthDate"),
-  isPoliticallyExposedPerson: text("isPoliticallyExposedPerson"),
-  userId: text("user_id").references(() => users.id, {
-    onDelete: "cascade",
-  }).notNull(),
-  addressId: text("address_id").references(() => address.id, {
-    onDelete: "cascade",
-  }).notNull(),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at'),
-});
-
-export const usersAccountRelations = relations(usersAccount, ({ one }) => ({
-  user: one(users, {
-    fields: [usersAccount.userId],
-    references: [users.id],
-  }),
-  address: one(address, {
-    fields: [usersAccount.addressId],
-    references: [address.id],
-  }),
-}));
-
-export const insertUserAccountSchema = createInsertSchema(usersAccount);

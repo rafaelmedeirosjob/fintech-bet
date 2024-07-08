@@ -17,10 +17,7 @@ const SEED_CATEGORIES = [
   { id: "category_7", name: "Clothing", userId: SEED_USER_ID, plaidId: null },
 ];
 
-const SEED_ACCOUNTS = [
-  { id: "account_1", name: "Checking", userId: SEED_USER_ID, plaidId: null },
-  { id: "account_2", name: "Savings", userId: SEED_USER_ID, plaidId: null },
-];
+
 
 const defaultTo = new Date();
 const defaultFrom = subDays(defaultTo, 90);
@@ -58,15 +55,6 @@ const generateTransactionsForDay = (day: Date) => {
     const amount = generateRandomAmount(category);
     const formattedAmount = convertAmountToMiliunits(isExpense ? -amount : amount); // Negative for expenses
 
-    SEED_TRANSACTIONS.push({
-      id: `transaction_${format(day, "yyyy-MM-dd")}_${i}`,
-      accountId: SEED_ACCOUNTS[0].id, // Assuming always using the first account for simplicity
-      categoryId: category.id,
-      date: day,
-      amount: formattedAmount,
-      payee: "Merchant",
-      notes: "Random transaction",
-    });
   }
 };
 
@@ -86,9 +74,7 @@ const main = async () => {
     // Seed categories
     await db.insert(categories).values(SEED_CATEGORIES).execute();
     // Seed accounts
-    await db.insert(accounts).values(SEED_ACCOUNTS).execute();
     // Seed transactions
-    await db.insert(transactions).values(SEED_TRANSACTIONS).execute();
 
   } catch (error) {
     console.error("Error during seed:", error);

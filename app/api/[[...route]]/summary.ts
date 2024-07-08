@@ -6,7 +6,7 @@ import { subDays, parse, differenceInDays } from "date-fns";
 import { and, desc, eq, gte, lt, lte, sql, sum } from "drizzle-orm";
 
 import { db } from "@/db/drizzle";
-import { accounts, categories, transactions } from "@/db/schema";
+import { accounts, categories, transactions, person, users } from "@/db/schema";
 import { calculatePercentageChange, fillMissingDays } from "@/lib/utils";
 
 const app = new Hono()
@@ -62,10 +62,11 @@ const app = new Hono()
               accounts.id,
             ),
           )
+          .innerJoin(person, eq(person.id, accounts.personId))
           .where(
             and(
               accountId ? eq(transactions.accountId, accountId) : undefined,
-              eq(accounts.userId, userId),
+              eq(person.userExternalId, userId),
               gte(transactions.date, startDate),
               lte(transactions.date, endDate),
             )
@@ -115,11 +116,11 @@ const app = new Hono()
             transactions.categoryId,
             categories.id,
           )
-        )
+        ).innerJoin(person, eq(person.id, accounts.personId))
         .where(
           and(
             accountId ? eq(transactions.accountId, accountId) : undefined,
-            eq(accounts.userId, auth.userId),
+            eq(person.userExternalId, auth.userId),
             lt(transactions.amount, 0),
             gte(transactions.date, startDate),
             lte(transactions.date, endDate),
@@ -157,12 +158,13 @@ const app = new Hono()
             accounts.id,
           ),
         )
+        .innerJoin(person, eq(person.id, accounts.personId))
         .where(
           and(
             accountId ? 
               eq(transactions.accountId, accountId) 
               : undefined,
-            eq(accounts.userId, auth.userId),
+            eq(person.userExternalId, auth.userId),
             gte(transactions.date, startDate),
             lte(transactions.date, endDate),
           )

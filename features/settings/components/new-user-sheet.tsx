@@ -1,7 +1,8 @@
 import { z } from "zod";
 
-import { useNewUser } from "@/features/settings/hooks/use-new-user";
+import { useOpenUser } from "@/features/settings/hooks/use-open-user";
 import { useCreateUser } from "@/features/settings/api/use-create-user";
+import { useEditUser } from "@/features/settings/api/use-edit-user";
 import {
   Sheet,
   SheetContent,
@@ -12,6 +13,7 @@ import {
 import { UserForm } from "./user-form";
 
 type FormValues = {
+  id: string;
   fullName: string;
   documentNumber: string;
   phoneNumber: string;
@@ -30,14 +32,23 @@ type FormValues = {
 };
 
 export const NewUserSheet = () => {
-  const { isOpen, onClose } = useNewUser();
-
-  const mutation = useCreateUser();
+  const { user, isOpen, onClose } = useOpenUser();
+  console.log("oi")
+  console.log(user)
+  let mutation = undefined;
+  if (user) {
+    mutation = useEditUser(user.id);
+  } else {
+    mutation = useCreateUser();
+  }
 
   const onSubmit = (values: FormValues) => {
     mutation.mutate(values, {
       onSuccess: () => {
         onClose();
+      },
+      onError: (error) => {
+        console.error('Erro na mutação:', error);
       },
     });
   };
@@ -57,21 +68,22 @@ export const NewUserSheet = () => {
           onSubmit={onSubmit} 
           disabled={mutation.isPending}
           defaultValues={{
-            documentNumber: "",
-            fullName: "",
-            phoneNumber: "",
-            motherName: "",
-            email: "",
-            birthDate: "",
-            postalCode: "",
-            street: "",
-            addressComplement: "",
-            number: "",
-            neighborhood: "",
-            city: "",
-            state: "",
-            longitude: "",
-            latitude: "",
+            id: user === undefined ? "" : user.id,
+            documentNumber: user === undefined ? "" : user.documentNumber,
+            fullName: user === undefined ? "" : user.fullName,
+            phoneNumber: user === undefined ? "" : user.phoneNumber,
+            motherName: user === undefined ? "" : user.motherName,
+            email: user === undefined ? "" : user.email,
+            birthDate: user === undefined ? "" : user.birthDate,
+            postalCode: user === undefined ? "" : user.postalCode,
+            street: user === undefined ? "" : user.street,
+            addressComplement: user === undefined ? "" : user.addressComplement,
+            number: user === undefined ? "" : user.number,
+            neighborhood: user === undefined ? "" : user.neighborhood,
+            city: user === undefined ? "" : user.city,
+            state: user === undefined ? "" : user.state,
+            longitude: user === undefined ? "" : user.longitude,
+            latitude: user === undefined ? "" : user.latitude,
           }}
         />
       </SheetContent>
