@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Hono } from "hono";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
 import { zValidator } from "@hono/zod-validator";
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
@@ -53,13 +53,21 @@ const app = new Hono()
       const data = await db
         .select({
           id: accounts.id,
+          amount: accounts.amount,
+          pendingAmount: accounts.pendingAmount,
+          name: person.fullName,
           documentNumber: accounts.documentNumber,
+          status: accounts.status
         })
         .from(accounts)
-        .leftJoin(person, eq(person.id, accounts.personId))
-        .leftJoin(users, eq(users.id, person.userId))
-        .where(eq(users.userExternalId, auth.userId));
-
+        .innerJoin(person, eq(person.id, accounts.personId))
+        .where(
+          and(
+            eq(person.userExternalId, auth.userId),
+            isNull(person.userId)
+          ),
+        );
+        console.log(data)
       return c.json({ data });
     })
   .get(
@@ -86,11 +94,9 @@ const app = new Hono()
           documentNumber: accounts.documentNumber,
         })
         .from(accounts)
-        .leftJoin(person, eq(person.id, accounts.personId))
-        .leftJoin(users, eq(users.id, person.userId))
+        .innerJoin(person, eq(person.id, accounts.personId))
         .where(
           and(
-            eq(users.userExternalId, auth.userId),
             eq(accounts.id, id)
           ),
         );
@@ -146,13 +152,13 @@ const app = new Hono()
       const [dataAccount] = await db.insert(accounts).values({
         id: createId(),
         status: "PROCESSING",
-        documentNumber: "",
+        documentNumber: dataPerson.documentNumber == null  ? "" : dataPerson.documentNumber,
         participant: "",
         accountOnboardingType: "",
         branch: "",
         account: "",
         accountType: "",
-        personId: dataPerson.id
+        personId: dataPerson.id == null  ? "" : dataPerson.id
       }).returning();
 
       return c.json({ dataAccount });

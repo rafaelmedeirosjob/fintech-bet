@@ -36,7 +36,7 @@ export const columns: ColumnDef<ResponseType>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "name",
+    accessorKey: "documentNumber",
     header: ({ column }) => {
       return (
         <Button
