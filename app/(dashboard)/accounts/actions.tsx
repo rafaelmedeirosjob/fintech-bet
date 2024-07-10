@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit, MoreHorizontal, Trash, KeyRoundIcon } from "lucide-react";
+import { Edit, MoreHorizontal, Trash, KeyRoundIcon, SendHorizonalIcon } from "lucide-react";
 
 import { useOpenAccount } from "@/features/accounts/hooks/use-open-account";
 import { useDeleteAccount } from "@/features/accounts/api/use-delete-account";
@@ -58,6 +58,13 @@ export const Actions = ({ id }: Props) => {
           >
             <KeyRoundIcon className="size-4 mr-2" />
             Ativar chave pix
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            disabled={deleteMutation.isPending}
+            onClick={() => onOpen(id)}
+          >
+            <SendHorizonalIcon className="size-4 mr-2" />
+            Transferir saldo para conta principal
           </DropdownMenuItem>
           <DropdownMenuItem
             disabled={deleteMutation.isPending}

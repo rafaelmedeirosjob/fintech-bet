@@ -6,6 +6,7 @@ import {
   pgTable, 
   text, 
   pgEnum,
+  numeric,
   timestamp,
 } from "drizzle-orm/pg-core";
 
@@ -111,6 +112,8 @@ export const insertAddress = createInsertSchema(address);
 export const accounts = pgTable("accounts", {
   id: text("id").primaryKey(),
   status: text("status"),
+  amount: numeric("amount"),
+  pendingAmount: numeric("pendingAmount"),
   documentNumber: text("documentNumber").notNull(),
   participant: text("participant"),
   accountOnboardingType: text("accountOnboardingType"),

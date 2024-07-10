@@ -15,6 +15,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { maskCpf, maskBirthDate, maskCep,maskPhone } from "@/lib/utils";
 
 type FormValues = {
   id: string;
@@ -62,45 +63,6 @@ export const UserForm = ({
     onDelete?.();
   };
 
-  // Função para aplicar a máscara de CPF
-  const maskCpf = (value: any) => {
-    return value
-      .replace(/\D/g, '') // Remove tudo o que não é dígito
-      .replace(/(\d{3})(\d)/, '$1.$2') // Adiciona o primeiro ponto
-      .replace(/(\d{3})(\d)/, '$1.$2') // Adiciona o segundo ponto
-      .replace(/(\d{3})(\d{1,2})/, '$1-$2') // Adiciona o traço
-      .replace(/(-\d{2})\d+?$/, '$1'); // Limita a 11 dígitos e 2 do traço
-  };
-
-  // Função para aplicar a máscara de telefone celular
-  const maskPhone = (value: any) => {
-    return value
-      .replace(/\D/g, '') // Remove tudo o que não é dígito
-      .replace(/^(\d{2})(\d)/, '($1) $2') // Adiciona os parênteses no DDD
-      .replace(/(\d{5})(\d)/, '$1-$2') // Adiciona o traço no número do celular
-      .replace(/(-\d{4})\d+?$/, '$1'); // Limita a 11 dígitos
-  };
-
-  // Função para validar o e-mail
-  const maskEmail = (value: any) => {
-    const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return re.test(String(value).toLowerCase());
-  };
-  // Função para validar o data de nascimento
-  const maskBirthDate = (value: string) => {
-    return value
-      .replace(/\D/g, '') // Remove tudo o que não é dígito
-      .replace(/(\d{2})(\d)/, '$1/$2') // Adiciona a primeira barra
-      .replace(/(\d{2})(\d)/, '$1/$2') // Adiciona a segunda barra
-      .replace(/(\d{4})\d+?$/, '$1'); // Limita a 8 dígitos
-  };
-
-  const maskCep = (value: any) => {
-    return value
-      .replace(/\D/g, '') // Remove tudo o que não é dígito
-      .replace(/(\d{5})(\d)/, '$1-$2') // Adiciona o traço
-      .replace(/(-\d{3})\d+?$/, '$1'); // Limita a 8 dígitos
-  };
 
   return (
     <Accordion.Root

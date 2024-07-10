@@ -23,7 +23,7 @@ const AccountsPage = () => {
   const deleteAccounts = useBulkDeleteAccounts();
   const accountsQuery = useGetAccounts();
   const accounts = accountsQuery.data || [];
-
+  console.log(accountsQuery)
   const isDisabled =
     accountsQuery.isLoading ||
     deleteAccounts.isPending;
@@ -59,7 +59,7 @@ const AccountsPage = () => {
         </CardHeader>
         <CardContent>
           <DataTable
-            filterKey="name"
+            filterKey="documentNumber"
             columns={columns} 
             data={accounts}
             onDelete={(row) => {
