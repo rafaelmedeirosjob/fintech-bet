@@ -97,6 +97,27 @@ export const SettingsCard = () => {
             <SubscriptionCheckout />
           </div>
         </div>
+        <Separator />
+        <div className="flex flex-col gap-y-2 lg:flex-row items-center py-4">
+          <p className="text-sm font-medium w-full lg:w-[16.5rem]">
+            Taxas
+          </p>
+          <div className="w-full flex items-center justify-between">
+            <div className={cn(
+              "text-sm truncate flex items-center",
+            )}>
+               Visualize as menores taxas do mercado oferecidas por nós
+            </div>
+            <Button
+              onClick={() => onOpen(userCreated)}
+              disabled={false}
+              size="sm"
+              variant="ghost"
+            >
+              Visualizar
+            </Button>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );

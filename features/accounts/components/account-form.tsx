@@ -14,7 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-
+import { maskCpf } from "@/lib/utils";
 const formSchema = insertAccountSchema.pick({
   documentNumber: true,
 });
@@ -68,6 +68,7 @@ export const AccountForm = ({
                   disabled={disabled}
                   placeholder="Digite o cpf da conta"
                   {...field}
+                  onChange={(e) => field.onChange(maskCpf(e.target.value))}
                 />
               </FormControl>
             </FormItem>
