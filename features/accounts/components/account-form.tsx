@@ -5,7 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { insertAccountSchema } from "@/db/schema";
 import {
   Form,
   FormControl,
@@ -15,11 +14,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { maskCpf } from "@/lib/utils";
-const formSchema = insertAccountSchema.pick({
-  documentNumber: true,
-});
 
-type FormValues = z.input<typeof formSchema>;
+type FormValues = {
+  fullName: string;
+  documentNumber: string;
+}
 
 type Props = {
   id?: string;
@@ -37,7 +36,6 @@ export const AccountForm = ({
   disabled,
 }: Props) => {
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
     defaultValues: defaultValues,
   });
 
@@ -72,23 +70,32 @@ export const AccountForm = ({
                 />
               </FormControl>
             </FormItem>
+            
+          )}
+        />
+                <FormField
+          name="fullName"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+              Nome completo
+              </FormLabel>
+              <FormControl>
+                <Input
+                  disabled={disabled}
+                  placeholder="Digite o nome completo do dono desta conta"
+                  {...field}
+                />
+              </FormControl>
+            </FormItem>
+            
           )}
         />
         <Button className="w-full" disabled={disabled}>
           {id ? "Salvar alterações" : "Criar conta"}
         </Button>
-        {!!id && (
-          <Button
-            type="button"
-            disabled={disabled}
-            onClick={handleDelete}
-            className="w-full"
-            variant="outline"
-          >
-            <Trash className="size-4 mr-2" />
-            Deletar conta
-          </Button>
-        )}
+
       </form>
     </Form>
   )

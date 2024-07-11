@@ -17,11 +17,10 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 
-const formSchema = insertAccountSchema.pick({
-  documentNumber: true,
-});
-
-type FormValues = z.input<typeof formSchema>;
+type FormValues = {
+  fullName: string;
+  documentNumber: string;
+}
 
 export const EditAccountSheet = () => {
   const { isOpen, onClose, id } = useOpenAccount();
@@ -67,9 +66,11 @@ export const EditAccountSheet = () => {
   };
 
   const defaultValues = accountQuery.data ? {
-    documentNumber: accountQuery.data.documentNumber
+    documentNumber: accountQuery.data.documentNumber,
+    fullName: accountQuery.data.fullName != null ? accountQuery.data.fullName : ""
   } : {
     documentNumber: "",
+    fullName: ""
   };
 
   return (
