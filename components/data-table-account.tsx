@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { Trash } from "lucide-react";
+import { SendHorizonalIcon, Trash } from "lucide-react";
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -43,8 +43,8 @@ export function DataTable<TData, TValue>({
   disabled,
 }: DataTableProps<TData, TValue>) {
   const [ConfirmDialog, confirm] = useConfirm(
-    "Are you sure?",
-    "You are about to perform a bulk delete."
+    "Tem certeza?",
+    "Você está transferindo o saldo das contas selecionadas para sua conta principal"
   );
 
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -97,8 +97,8 @@ export function DataTable<TData, TValue>({
               }
             }}
           >
-            <Trash className="size-4 mr-2" />
-            Delete ({table.getFilteredSelectedRowModel().rows.length})
+            <SendHorizonalIcon className="size-4 mr-2" />
+            Transferir Saldo para conta principal ({table.getFilteredSelectedRowModel().rows.length})
           </Button>
         )}
       </div>
@@ -139,7 +139,7 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  Sem resultados.
                 </TableCell>
               </TableRow>
             )}

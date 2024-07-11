@@ -92,6 +92,9 @@ const app = new Hono()
         .select({
           id: accounts.id,
           documentNumber: accounts.documentNumber,
+          status: accounts.status,
+          amount: accounts.amount,
+          fullName: person.fullName
         })
         .from(accounts)
         .innerJoin(person, eq(person.id, accounts.personId))

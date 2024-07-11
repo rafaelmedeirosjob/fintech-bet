@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit, MoreHorizontal, Trash, KeyRoundIcon, SendHorizonalIcon } from "lucide-react";
+import { Edit, MoreHorizontal, KeyRoundIcon, ReceiptCentIcon, QrCodeIcon } from "lucide-react";
 
 import { useOpenAccount } from "@/features/accounts/hooks/use-open-account";
 import { useDeleteAccount } from "@/features/accounts/api/use-delete-account";
@@ -63,15 +63,15 @@ export const Actions = ({ id }: Props) => {
             disabled={deleteMutation.isPending}
             onClick={() => onOpen(id)}
           >
-            <SendHorizonalIcon className="size-4 mr-2" />
-            Transferir saldo para conta principal
+            <ReceiptCentIcon className="size-4 mr-2" />
+            Depositar 
           </DropdownMenuItem>
           <DropdownMenuItem
             disabled={deleteMutation.isPending}
-            onClick={handleDelete}
+            onClick={() => onOpen(id)}
           >
-            <Trash className="size-4 mr-2" />
-            Delete
+            <QrCodeIcon className="size-4 mr-2" />
+            Pagar QR Code da casa 
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

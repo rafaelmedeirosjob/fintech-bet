@@ -120,7 +120,7 @@ export const ImportCard = ({
               size="sm" 
               className="w-full lg:w-auto"
             >
-              Cancel
+              Cancelar
             </Button>
             <Button
               size="sm"

@@ -33,8 +33,6 @@ type FormValues = {
 
 export const NewUserSheet = () => {
   const { user, isOpen, onClose } = useOpenUser();
-  console.log("oi")
-  console.log(user)
   let mutation = undefined;
   if (user) {
     mutation = useEditUser(user.id);
