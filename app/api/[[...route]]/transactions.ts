@@ -10,9 +10,8 @@ import { db } from "@/db/drizzle";
 import { 
   transactions, 
   person,
-  users,
   insertTransactionSchema, 
-  categories,
+  typeTransactions,
   accounts
 } from "@/db/schema";
 
@@ -37,31 +36,29 @@ const app = new Hono()
       const defaultFrom = subDays(defaultTo, 30);
 
       const startDate = from 
-        ? parse(from, "yyyy-MM-dd", new Date())
+        ? parse(from, "dd-MM-yyyy", new Date())
         : defaultFrom;
       const endDate = to
-        ? parse(to, "yyyy-MM-dd", new Date())
+        ? parse(to, "dd-MM-yyyy", new Date())
         : defaultTo;
 
       const data = await db
         .select({
           id: transactions.id,
           date: transactions.date,
-          category: categories.name,
-          categoryId: transactions.categoryId,
-          payee: transactions.payee,
+          type: typeTransactions.description,
+          idType: typeTransactions.id,
           amount: transactions.amount,
           notes: transactions.notes,
-          account: accounts.documentNumber,
-          accountId: transactions.accountId,
+          documentNumber: person.documentNumber,
+          accountId: accounts.id
         })
         .from(transactions)
-        .innerJoin(accounts, eq(transactions.accountId, accounts.id))
-        .innerJoin(person, eq(accounts.personId, person.id))
-        .leftJoin(categories, eq(transactions.categoryId, categories.id))
+        .innerJoin(person, eq(transactions.personId, person.id))
+        .innerJoin(accounts, eq(accounts.personId, transactions.personId))
+        .leftJoin(typeTransactions, eq(transactions.typeTransactionId, typeTransactions.id))
         .where(
           and(
-            accountId ? eq(transactions.accountId, accountId) : undefined,
             eq(person.userExternalId, auth.userId),
             gte(transactions.date, startDate),
             lte(transactions.date, endDate),
@@ -93,15 +90,14 @@ const app = new Hono()
         .select({
           id: transactions.id,
           date: transactions.date,
-          categoryId: transactions.categoryId,
-          payee: transactions.payee,
+          type: typeTransactions.description,
           amount: transactions.amount,
           notes: transactions.notes,
-          accountId: transactions.accountId,
+          documentNumber: person.documentNumber
         })
         .from(transactions)
-        .innerJoin(accounts, eq(transactions.accountId, accounts.id))
         .innerJoin(person, eq(accounts.personId, person.id))
+        .leftJoin(typeTransactions, eq(transactions.typeTransactionId, typeTransactions.id))
         .where(
           and(
             eq(transactions.id, id),
@@ -169,153 +165,153 @@ const app = new Hono()
       return c.json({ data });
     },
   )
-  .post(
-    "/bulk-delete",
-    clerkMiddleware(),
-    zValidator(
-      "json",
-      z.object({
-        ids: z.array(z.string()),
-      }),
-    ),
-    async (c) => {
-      const auth = getAuth(c);
-      const values = c.req.valid("json");
+  // .post(
+  //   "/bulk-delete",
+  //   clerkMiddleware(),
+  //   zValidator(
+  //     "json",
+  //     z.object({
+  //       ids: z.array(z.string()),
+  //     }),
+  //   ),
+  //   async (c) => {
+  //     const auth = getAuth(c);
+  //     const values = c.req.valid("json");
 
-      if (!auth?.userId) {
-        return c.json({ error: "Unauthorized" }, 401);
-      }
+  //     if (!auth?.userId) {
+  //       return c.json({ error: "Unauthorized" }, 401);
+  //     }
 
-      const transactionsToDelete = db.$with("transactions_to_delete").as(
-        db.select({ id: transactions.id }).from(transactions)
-          .innerJoin(accounts, eq(transactions.accountId, accounts.id))
-          .innerJoin(person, eq(accounts.personId, person.id))
-          .where(and(
-            inArray(transactions.id, values.ids),
-            eq(person.userId, auth.userId),
-          )),
-      );
+  //     const transactionsToDelete = db.$with("transactions_to_delete").as(
+  //       db.select({ id: transactions.id }).from(transactions)
+  //         .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+  //         .innerJoin(person, eq(accounts.personId, person.id))
+  //         .where(and(
+  //           inArray(transactions.id, values.ids),
+  //           eq(person.userId, auth.userId),
+  //         )),
+  //     );
 
-      const data = await db
-        .with(transactionsToDelete)
-        .delete(transactions)
-        .where(
-          inArray(transactions.id, sql`(select id from ${transactionsToDelete})`)
-        )
-        .returning({
-          id: transactions.id,
-        });
+  //     const data = await db
+  //       .with(transactionsToDelete)
+  //       .delete(transactions)
+  //       .where(
+  //         inArray(transactions.id, sql`(select id from ${transactionsToDelete})`)
+  //       )
+  //       .returning({
+  //         id: transactions.id,
+  //       });
 
-      return c.json({ data });
-    },
-  )
-  .patch(
-    "/:id",
-    clerkMiddleware(),
-    zValidator(
-      "param",
-      z.object({
-        id: z.string().optional(),
-      }),
-    ),
-    zValidator(
-      "json",
-      insertTransactionSchema.omit({
-        id: true,
-      })
-    ),
-    async (c) => {
-      const auth = getAuth(c);
-      const { id } = c.req.valid("param");
-      const values = c.req.valid("json");
+  //     return c.json({ data });
+  //   },
+  // )
+  // .patch(
+  //   "/:id",
+  //   clerkMiddleware(),
+  //   zValidator(
+  //     "param",
+  //     z.object({
+  //       id: z.string().optional(),
+  //     }),
+  //   ),
+  //   zValidator(
+  //     "json",
+  //     insertTransactionSchema.omit({
+  //       id: true,
+  //     })
+  //   ),
+  //   async (c) => {
+  //     const auth = getAuth(c);
+  //     const { id } = c.req.valid("param");
+  //     const values = c.req.valid("json");
 
-      if (!id) {
-        return c.json({ error: "Missing id" }, 400);
-      }
+  //     if (!id) {
+  //       return c.json({ error: "Missing id" }, 400);
+  //     }
 
-      if (!auth?.userId) {
-        return c.json({ error: "Unauthorized" }, 401);
-      }
+  //     if (!auth?.userId) {
+  //       return c.json({ error: "Unauthorized" }, 401);
+  //     }
 
-      const transactionsToUpdate = db.$with("transactions_to_update").as(
-        db.select({ id: transactions.id })
-          .from(transactions)
-          .innerJoin(accounts, eq(transactions.accountId, accounts.id))
-          .innerJoin(person, eq(accounts.personId, person.id))
-          .where(and(
-            eq(transactions.id, id),
-            eq(person.userExternalId, auth.userId),
-          )),
-      );
+  //     const transactionsToUpdate = db.$with("transactions_to_update").as(
+  //       db.select({ id: transactions.id })
+  //         .from(transactions)
+  //         .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+  //         .innerJoin(person, eq(accounts.personId, person.id))
+  //         .where(and(
+  //           eq(transactions.id, id),
+  //           eq(person.userExternalId, auth.userId),
+  //         )),
+  //     );
 
-      const [data] = await db
-        .with(transactionsToUpdate)
-        .update(transactions)
-        .set(values)
-        .where(
-          inArray(transactions.id, sql`(select id from ${transactionsToUpdate})`)
-        )
-        .returning();
+  //     const [data] = await db
+  //       .with(transactionsToUpdate)
+  //       .update(transactions)
+  //       .set(values)
+  //       .where(
+  //         inArray(transactions.id, sql`(select id from ${transactionsToUpdate})`)
+  //       )
+  //       .returning();
         
 
-      if (!data) {
-        return c.json({ error: "Not found" }, 404);
-      }
+  //     if (!data) {
+  //       return c.json({ error: "Not found" }, 404);
+  //     }
 
-      return c.json({ data });
-    },
-  )
-  .delete(
-    "/:id",
-    clerkMiddleware(),
-    zValidator(
-      "param",
-      z.object({
-        id: z.string().optional(),
-      }),
-    ),
-    async (c) => {
-      const auth = getAuth(c);
-      const { id } = c.req.valid("param");
+  //     return c.json({ data });
+  //   },
+  // )
+  // .delete(
+  //   "/:id",
+  //   clerkMiddleware(),
+  //   zValidator(
+  //     "param",
+  //     z.object({
+  //       id: z.string().optional(),
+  //     }),
+  //   ),
+  //   async (c) => {
+  //     const auth = getAuth(c);
+  //     const { id } = c.req.valid("param");
 
-      if (!id) {
-        return c.json({ error: "Missing id" }, 400);
-      }
+  //     if (!id) {
+  //       return c.json({ error: "Missing id" }, 400);
+  //     }
 
-      if (!auth?.userId) {
-        return c.json({ error: "Unauthorized" }, 401);
-      }
+  //     if (!auth?.userId) {
+  //       return c.json({ error: "Unauthorized" }, 401);
+  //     }
 
-      const transactionsToDelete = db.$with("transactions_to_delete").as(
-        db.select({ id: transactions.id })
-          .from(transactions)
-          .innerJoin(accounts, eq(transactions.accountId, accounts.id))
-          .innerJoin(person, eq(accounts.personId, person.id))
-          .where(and(
-            eq(transactions.id, id),
-            eq(person.userExternalId, auth.userId),
-          )),
-      );
+  //     const transactionsToDelete = db.$with("transactions_to_delete").as(
+  //       db.select({ id: transactions.id })
+  //         .from(transactions)
+  //         .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+  //         .innerJoin(person, eq(accounts.personId, person.id))
+  //         .where(and(
+  //           eq(transactions.id, id),
+  //           eq(person.userExternalId, auth.userId),
+  //         )),
+  //     );
 
-      const [data] = await db
-        .with(transactionsToDelete)
-        .delete(transactions)
-        .where(
-          inArray(
-            transactions.id,
-            sql`(select id from ${transactionsToDelete})`
-          ),
-        )
-        .returning({
-          id: transactions.id,
-        });
+  //     const [data] = await db
+  //       .with(transactionsToDelete)
+  //       .delete(transactions)
+  //       .where(
+  //         inArray(
+  //           transactions.id,
+  //           sql`(select id from ${transactionsToDelete})`
+  //         ),
+  //       )
+  //       .returning({
+  //         id: transactions.id,
+  //       });
 
-      if (!data) {
-        return c.json({ error: "Not found" }, 404);
-      }
+  //     if (!data) {
+  //       return c.json({ error: "Not found" }, 404);
+  //     }
 
-      return c.json({ data });
-    },
-  );
+  //     return c.json({ data });
+  //   },
+  // );
 
 export default app;

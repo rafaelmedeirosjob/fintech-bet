@@ -2,7 +2,7 @@ import { config } from "dotenv";
 import { subDays } from "date-fns";
 import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
-import { categories, accounts, transactions } from "@/db/schema";
+import { typeTransactions, accounts, transactions } from "@/db/schema";
 
 config({ path: ".env.local" });
 
@@ -27,7 +27,7 @@ const SEED_TRANSACTIONS: typeof transactions.$inferSelect[] = [];
 import { eachDayOfInterval, format } from 'date-fns';
 import { convertAmountToMiliunits } from "@/lib/utils";
 
-const generateRandomAmount = (category: typeof categories.$inferInsert) => {
+const generateRandomAmount = (category: typeof typeTransactions.$inferInsert) => {
   switch (category.name) {
     case "Rent":
       return Math.random() * 400 + 90; // Rent will likely be a larger amount
@@ -70,9 +70,9 @@ const main = async () => {
     // Reset database
     await db.delete(transactions).execute();
     await db.delete(accounts).execute();
-    await db.delete(categories).execute();
+    await db.delete(typeTransactions).execute();
     // Seed categories
-    await db.insert(categories).values(SEED_CATEGORIES).execute();
+    await db.insert(typeTransactions).values(SEED_CATEGORIES).execute();
     // Seed accounts
     // Seed transactions
 

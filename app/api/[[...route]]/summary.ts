@@ -6,7 +6,7 @@ import { subDays, parse, differenceInDays } from "date-fns";
 import { and, desc, eq, gte, lt, lte, sql, sum } from "drizzle-orm";
 
 import { db } from "@/db/drizzle";
-import { accounts, categories, transactions, person, users } from "@/db/schema";
+import { accounts, typeTransactions, transactions, person, users } from "@/db/schema";
 import { calculatePercentageChange, fillMissingDays } from "@/lib/utils";
 
 const app = new Hono()
@@ -33,10 +33,10 @@ const app = new Hono()
       const defaultFrom = subDays(defaultTo, 30);
 
       const startDate = from
-        ? parse(from, "yyyy-MM-dd", new Date())
+        ? parse(from, "dd-MM-yyyy", new Date())
         : defaultFrom;
       const endDate = to
-        ? parse(to, "yyyy-MM-dd", new Date())
+        ? parse(to, "dd-MM-yyyy", new Date())
         : defaultTo;
 
       const periodLength = differenceInDays(endDate, startDate) + 1;
@@ -55,17 +55,11 @@ const app = new Hono()
             remaining: sum(transactions.amount).mapWith(Number),
           })
           .from(transactions)
-          .innerJoin(
-            accounts,
-            eq(
-              transactions.accountId,
-              accounts.id,
-            ),
-          )
-          .innerJoin(person, eq(person.id, accounts.personId))
+          .innerJoin(person, eq(person.id, transactions.personId))
+          .innerJoin(accounts, eq(accounts.personId, person.id))
           .where(
             and(
-              accountId ? eq(transactions.accountId, accountId) : undefined,
+              accountId ? eq(accounts.id, accountId) : undefined,
               eq(person.userExternalId, userId),
               gte(transactions.date, startDate),
               lte(transactions.date, endDate),
@@ -99,34 +93,28 @@ const app = new Hono()
 
       const category = await db
         .select({
-          name: categories.name,
+          name: typeTransactions.name,
           value: sql`SUM(ABS(${transactions.amount}))`.mapWith(Number),
         })
         .from(transactions)
         .innerJoin(
-          accounts,
+          typeTransactions,
           eq(
-            transactions.accountId,
-            accounts.id,
-          ),
-        )
-        .innerJoin(
-          categories,
-          eq(
-            transactions.categoryId,
-            categories.id,
+            transactions.typeTransactionId,
+            typeTransactions.id,
           )
-        ).innerJoin(person, eq(person.id, accounts.personId))
+        ).innerJoin(person, eq(person.id, transactions.personId))
+        .innerJoin(accounts, eq(accounts.personId, person.id))
         .where(
           and(
-            accountId ? eq(transactions.accountId, accountId) : undefined,
+            accountId ? eq(accounts.id, accountId) : undefined,
             eq(person.userExternalId, auth.userId),
             lt(transactions.amount, 0),
             gte(transactions.date, startDate),
             lte(transactions.date, endDate),
           )
         )
-        .groupBy(categories.name)
+        .groupBy(typeTransactions.name)
         .orderBy(desc(
           sql`SUM(ABS(${transactions.amount}))`
         ));
@@ -151,19 +139,11 @@ const app = new Hono()
           expenses: sql`SUM(CASE WHEN ${transactions.amount} < 0 THEN ABS(${transactions.amount}) ELSE 0 END)`.mapWith(Number),
         })
         .from(transactions)
-        .innerJoin(
-          accounts,
-          eq(
-            transactions.accountId,
-            accounts.id,
-          ),
-        )
-        .innerJoin(person, eq(person.id, accounts.personId))
+        .innerJoin(person, eq(person.id, transactions.personId))
+        .innerJoin(accounts, eq(accounts.personId, person.id))
         .where(
           and(
-            accountId ? 
-              eq(transactions.accountId, accountId) 
-              : undefined,
+            accountId ? eq(accounts.id, accountId) : undefined,
             eq(person.userExternalId, auth.userId),
             gte(transactions.date, startDate),
             lte(transactions.date, endDate),

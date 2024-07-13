@@ -10,8 +10,6 @@ import { formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-
-import { Actions } from "./actions";
 import { AccountColumn } from "./account-column";
 import { CategoryColumn } from "./category-column";
 
@@ -64,14 +62,14 @@ export const columns: ColumnDef<ResponseType>[] = [
     }
   },
   {
-    accessorKey: "category",
+    accessorKey: "type",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Categoria
+          Tipo
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )
@@ -80,21 +78,21 @@ export const columns: ColumnDef<ResponseType>[] = [
       return (
         <CategoryColumn
           id={row.original.id}
-          category={row.original.category}
-          categoryId={row.original.categoryId}
+          category={row.original.type}
+          categoryId={row.original.idType}
         />
       );
     }
   },
   {
-    accessorKey: "payee",
+    accessorKey: "notes",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Beneficiário
+          Descrição
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )
@@ -127,7 +125,7 @@ export const columns: ColumnDef<ResponseType>[] = [
     }
   },
   {
-    accessorKey: "account",
+    accessorKey: "documentNumber",
     header: ({ column }) => {
       return (
         <Button
@@ -142,14 +140,10 @@ export const columns: ColumnDef<ResponseType>[] = [
     cell: ({ row }) => {
       return (
         <AccountColumn
-          account={row.original.account}
+          account={row.original.documentNumber != null ? row.original.documentNumber : ""}
           accountId={row.original.accountId}
         />
       )
     }
   },
-  {
-    id: "actions",
-    cell: ({ row }) => <Actions id={row.original.id} />
-  }
 ];
