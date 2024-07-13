@@ -1,5 +1,5 @@
 {
-  "id": "9648ca07-c4ac-452f-bbc5-4b756e4f8f67",
+  "id": "0de70623-c42f-48a0-9ff0-ab9418f4cf0b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "6",
   "dialect": "postgresql",
@@ -325,23 +325,15 @@
           "primaryKey": true,
           "notNull": true
         },
-        "user_id": {
-          "name": "user_id",
+        "type": {
+          "name": "type",
           "type": "text",
           "primaryKey": false,
           "notNull": false
         },
-        "feeType": {
-          "name": "feeType",
-          "type": "feeType",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "feeOrigin": {
-          "name": "feeOrigin",
-          "type": "feeOrigin",
-          "typeSchema": "public",
+        "origin": {
+          "name": "origin",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -353,21 +345,7 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {
-        "fees_user_id_users_id_fk": {
-          "name": "fees_user_id_users_id_fk",
-          "tableFrom": "fees",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -568,7 +546,8 @@
           "name": "date",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "person_id": {
           "name": "person_id",
@@ -655,10 +634,30 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "fee_id": {
+          "name": "fee_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "type_transactions_fee_id_fees_id_fk": {
+          "name": "type_transactions_fee_id_fees_id_fk",
+          "tableFrom": "type_transactions",
+          "tableTo": "fees",
+          "columnsFrom": [
+            "fee_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
@@ -730,23 +729,6 @@
     }
   },
   "enums": {
-    "public.feeOrigin": {
-      "name": "feeOrigin",
-      "schema": "public",
-      "values": [
-        "create-account",
-        "withdraw-zero-fee",
-        "withdraw-main-account"
-      ]
-    },
-    "public.feeType": {
-      "name": "feeType",
-      "schema": "public",
-      "values": [
-        "percent",
-        "value"
-      ]
-    },
     "public.user": {
       "name": "user",
       "schema": "public",
@@ -754,16 +736,6 @@
         "user",
         "admin",
         "user-admin"
-      ]
-    },
-    "public.transactionType": {
-      "name": "transactionType",
-      "schema": "public",
-      "values": [
-        "create-account",
-        "withdraw-zero-fee",
-        "withdraw-main-account",
-        "deposit-main-account"
       ]
     }
   },

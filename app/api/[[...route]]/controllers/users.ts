@@ -1,15 +1,13 @@
 import { number, z } from "zod";
 import { Hono } from "hono";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
 import { zValidator } from "@hono/zod-validator";
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 
 import { db } from "@/db/drizzle";
 import { address, users, person } from "@/db/schema";
-import { Citrus } from "lucide-react";
-import { FaCity } from "react-icons/fa";
-
+import { saveAccount } from "../services/account-service";
 // Definição do schema combinado
 const insertUserSchema = z.object({
   documentNumber: z.string().optional(),
@@ -99,7 +97,7 @@ const app = new Hono()
       }
 
       console.log('Saving user data...');
-      const [data2] = await db.insert(users).values({
+      const [userSaved] = await db.insert(users).values({
         id: createId(),
         email: values.email,
         emailVerified: "true",
@@ -109,44 +107,14 @@ const app = new Hono()
         userExternalId: auth.userId
       }).returning();
 
-      const [data1] = await db.insert(address).values({
-        id: createId(),
-        postalCode: values.postalCode,
-        street: values.number,
-        number: values.number,
-        addressComplement: values.addressComplement,
-        neighborhood: values.neighborhood,
-        city: values.city,
-        state: values.state,
-        longitude: values.longitude,
-        latitude: values.latitude
-      }).returning();
+      console.log(userSaved);
 
-      console.log('Saving users data...');
-      const [data] = await db.insert(person).values({
-        id: createId(),
-        userExternalId: auth.userId,
-        documentNumber: values.documentNumber,
-        phoneNumber: values.phoneNumber,
-        fullName: values.fullName,
-        email: values.email,
-        motherName: values.motherName,
-        socialName: values.socialName,
-        birthDate: values.birthDate,
-        isPoliticallyExposedPerson: "false",
-        userId: data2.id,
-        addressId: data1.id
-      }).returning();
+      const response = await saveAccount(auth.userId, values, userSaved.id);
       
-      console.log(data)
+      console.log(response)
 
 
-      console.log(data1)
-
-      console.log(data2)
-
-
-      return c.json({ data });
+      return c.json({ response });
   })
   .patch(
     "/:id",
