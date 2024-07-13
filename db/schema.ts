@@ -11,11 +11,6 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const RoleEnum = pgEnum('user', ['user', 'admin', 'user-admin']);
-export const FeesOriginEnum = pgEnum('feeOrigin', ['create-account', 'withdraw-zero-fee', 'withdraw-main-account']);
-export const FeesTypeEnum = pgEnum('feeType', ['percent', 'value']);
-export const TransactionTypeEnum = pgEnum('transactionType', ['create-account', 'withdraw-zero-fee', 'withdraw-main-account','deposit-main-account',
-  
-]);
 
 
 export const users = pgTable("users", {
@@ -67,19 +62,14 @@ export const insertAuthSchema = createInsertSchema(auth);
 
 export const fees = pgTable("fees", {
   id: text("id").primaryKey(),
-  userId: text("user_id").references(() => users.id, {
-    onDelete: "cascade",
-  }),
-  type: FeesTypeEnum('feeType'),
-  origin: FeesOriginEnum('feeOrigin'),
+  type: text('type'),
+  origin: text('origin'),
   value: text("value")
 });
 
-export const feesRelations = relations(fees, ({ one }) => ({
-  user: one(users, {
-    fields: [fees.userId],
-    references: [users.id],
-  }),
+export const feesRelations = relations(fees, ({ many }) => ({
+  transactions: many(transactions),
+  typeTransactions: many(typeTransactions),
 }));
 
 export const insertFeesSchema = createInsertSchema(fees);
@@ -166,18 +156,25 @@ export const insertAccountSchema = createInsertSchema(accounts);
 export const typeTransactions = pgTable("type_transactions", {
   id: text("id").primaryKey(),
   description: text("description"),
-  name: text("name").notNull()
+  name: text("name").notNull(),
+  feeId: text("fee_id").references(() => fees.id, {
+    onDelete: "cascade",
+  })
 });
 
-export const typeTransactionsRelations = relations(typeTransactions, ({ many }) => ({
+export const typeTransactionsRelations = relations(typeTransactions, ({ many, one }) => ({
   transactions: many(transactions),
+  fee: one(fees, {
+    fields: [typeTransactions.feeId],
+    references: [fees.id],
+  })
 }));
 
 export const transactions = pgTable("transactions", {
   id: text("id").primaryKey(),
   amount: integer("amount").notNull(),
   notes: text("notes").notNull(),
-  date: timestamp("date", { mode: "date" }).notNull(),
+  date: timestamp("date", { mode: "date" }).notNull().defaultNow(),
   personId: text("person_id").references(() => person.id, {
     onDelete: "cascade",
   }).notNull(),
@@ -197,6 +194,11 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({
   fee: one(fees, {
     fields: [transactions.feeId],
     references: [fees.id],
+  })
+  ,
+  typeTransactions: one(typeTransactions, {
+    fields: [transactions.typeTransactionId],
+    references: [typeTransactions.id],
   })
 }));
 

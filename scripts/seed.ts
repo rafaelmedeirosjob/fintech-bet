@@ -2,7 +2,7 @@ import { config } from "dotenv";
 import { subDays } from "date-fns";
 import { drizzle } from "drizzle-orm/neon-http";
 import { neon } from "@neondatabase/serverless";
-import { typeTransactions, accounts, transactions } from "@/db/schema";
+import { typeTransactions, accounts,fees, transactions } from "@/db/schema";
 
 config({ path: ".env.local" });
 
@@ -10,60 +10,26 @@ const sql = neon(process.env.DATABASE_URL!);
 const db = drizzle(sql);
 
 const SEED_USER_ID = "user_2g1JOKQh3QUlqivKbp70wEJobvd";
-const SEED_CATEGORIES = [
-  { id: "category_1", name: "Food", userId: SEED_USER_ID, plaidId: null },
-  { id: "category_2", name: "Rent", userId: SEED_USER_ID, plaidId: null },
-  { id: "category_3", name: "Utilities", userId: SEED_USER_ID, plaidId: null },
-  { id: "category_7", name: "Clothing", userId: SEED_USER_ID, plaidId: null },
+const SEED_FEES = [
+  { id: "1", type: "value", origin: "create-account", value: '6' },
+  { id: "2", type: "value", origin: "withdraw-zero-fee", value: '10' },
+  { id: "3", type: "percent", origin: "withdraw-main-account", value: '15' },
+  { id: "4", type: "percent", origin: "transfer-between-account", value: '0.01' }
 ];
+
+const SEED_TYPE_TRANSACTIONS = [
+  { id: "1", name: "create-account", description: "Criação de conta", feeId: "1" },
+  { id: "2", name: "withdraw-zero-fee", description: "Saque sem taxas", feeId: "2" },
+  { id: "3", name: "withdraw-main-account", description: "Retirada da plataforma", feeId: "3"  },
+  { id: "4", name: "deposit-main-account", description: "Depósito na plataforma", feeId: null },
+];
+
+
 
 
 
 const defaultTo = new Date();
 const defaultFrom = subDays(defaultTo, 90);
-
-const SEED_TRANSACTIONS: typeof transactions.$inferSelect[] = [];
-
-import { eachDayOfInterval, format } from 'date-fns';
-import { convertAmountToMiliunits } from "@/lib/utils";
-
-const generateRandomAmount = (category: typeof typeTransactions.$inferInsert) => {
-  switch (category.name) {
-    case "Rent":
-      return Math.random() * 400 + 90; // Rent will likely be a larger amount
-    case "Utilities":
-      return Math.random() * 200 + 50;
-    case "Food":
-      return Math.random() * 30 + 10;
-    case "Transportation":
-    case "Health":
-      return Math.random() * 50 + 15;
-    case "Entertainment":
-    case "Clothing":
-    case "Miscellaneous":
-      return Math.random() * 100 + 20;
-    default:
-      return Math.random() * 50 + 10;
-  }
-};
-
-const generateTransactionsForDay = (day: Date) => {
-  const numTransactions = Math.floor(Math.random() * 4) + 1; // 1 to 4 transactions per day
-  for (let i = 0; i < numTransactions; i++) {
-    const category = SEED_CATEGORIES[Math.floor(Math.random() * SEED_CATEGORIES.length)];
-    const isExpense = Math.random() > 0.6; // 60% chance of being an expense
-    const amount = generateRandomAmount(category);
-    const formattedAmount = convertAmountToMiliunits(isExpense ? -amount : amount); // Negative for expenses
-
-  }
-};
-
-const generateTransactions = () => {
-  const days = eachDayOfInterval({ start: defaultFrom, end: defaultTo });
-  days.forEach(day => generateTransactionsForDay(day));
-};
-
-generateTransactions();
 
 const main = async () => {
   try {
@@ -72,7 +38,8 @@ const main = async () => {
     await db.delete(accounts).execute();
     await db.delete(typeTransactions).execute();
     // Seed categories
-    await db.insert(typeTransactions).values(SEED_CATEGORIES).execute();
+    await db.insert(fees).values(SEED_FEES).execute();
+    await db.insert(typeTransactions).values(SEED_TYPE_TRANSACTIONS).execute();
     // Seed accounts
     // Seed transactions
 

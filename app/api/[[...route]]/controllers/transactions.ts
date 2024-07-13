@@ -12,7 +12,8 @@ import {
   person,
   insertTransactionSchema, 
   typeTransactions,
-  accounts
+  accounts,
+  fees
 } from "@/db/schema";
 
 const app = new Hono()

@@ -1,10 +1,10 @@
 import { Hono } from "hono"
 import { handle } from "hono/vercel";
-import summary from "./summary";
-import accounts from "./accounts";
-import users from "./users";
-import transactions from "./transactions";
-import subscriptions from "./subscriptions";
+import summary from "./controllers/summary";
+import accounts from "./controllers/accounts";
+import users from "./controllers/users";
+import transactions from "./controllers/transactions";
+import subscriptions from "./controllers/subscriptions";
 
 export const runtime = "nodejs";
 

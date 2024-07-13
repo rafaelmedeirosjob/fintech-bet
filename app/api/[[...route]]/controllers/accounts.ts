@@ -4,9 +4,9 @@ import { and, eq, inArray, isNull } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
 import { zValidator } from "@hono/zod-validator";
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
-
+import { saveAccount } from "../services/account-service";
 import { db } from "@/db/drizzle";
-import { accounts, insertAccountSchema, person, users, address } from "@/db/schema";
+import { accounts, insertAccountSchema, person, transactions, address } from "@/db/schema";
 
 // Definição do schema combinado
 const insertPersonSchema = z.object({
@@ -122,49 +122,10 @@ const app = new Hono()
       if (!auth?.userId) {
         return c.json({ error: "Unauthorized" }, 401);
       }
+      const response = await saveAccount(auth.userId,values, null);
+      return c.json({ response });
 
-      const [dataAddress] = await db.insert(address).values({
-        id: createId(),
-        postalCode: values.postalCode,
-        street: values.number,
-        number: values.number,
-        addressComplement: values.addressComplement,
-        neighborhood: values.neighborhood,
-        city: values.city,
-        state: values.state,
-        longitude: values.longitude,
-        latitude: values.latitude
-      }).returning();
-
-      console.log('Saving users data...');
-      const [dataPerson] = await db.insert(person).values({
-        id: createId(),
-        userExternalId: auth.userId,
-        documentNumber: values.documentNumber,
-        phoneNumber: values.phoneNumber,
-        fullName: values.fullName,
-        email: values.email,
-        motherName: values.motherName,
-        socialName: values.socialName,
-        birthDate: values.birthDate,
-        isPoliticallyExposedPerson: "false",
-        userId: null,
-        addressId: dataAddress.id
-      }).returning();
-
-      const [dataAccount] = await db.insert(accounts).values({
-        id: createId(),
-        status: "PROCESSING",
-        documentNumber: dataPerson.documentNumber == null  ? "" : dataPerson.documentNumber,
-        participant: "",
-        accountOnboardingType: "",
-        branch: "",
-        account: "",
-        accountType: "",
-        personId: dataPerson.id == null  ? "" : dataPerson.id
-      }).returning();
-
-      return c.json({ dataAccount });
+      
     })
   .post(
     "/bulk-delete",

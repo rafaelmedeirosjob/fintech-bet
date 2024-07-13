@@ -1,23 +1,5 @@
 DO $$ BEGIN
- CREATE TYPE "public"."feeOrigin" AS ENUM('create-account', 'withdraw-zero-fee', 'withdraw-main-account');
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- CREATE TYPE "public"."feeType" AS ENUM('percent', 'value');
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
  CREATE TYPE "public"."user" AS ENUM('user', 'admin', 'user-admin');
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- CREATE TYPE "public"."transactionType" AS ENUM('create-account', 'withdraw-zero-fee', 'withdraw-main-account', 'deposit-main-account');
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -76,9 +58,8 @@ CREATE TABLE IF NOT EXISTS "connected_banks" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "fees" (
 	"id" text PRIMARY KEY NOT NULL,
-	"user_id" text,
-	"feeType" "feeType",
-	"feeOrigin" "feeOrigin",
+	"type" text,
+	"origin" text,
 	"value" text
 );
 --> statement-breakpoint
@@ -112,7 +93,7 @@ CREATE TABLE IF NOT EXISTS "transactions" (
 	"id" text PRIMARY KEY NOT NULL,
 	"amount" integer NOT NULL,
 	"notes" text NOT NULL,
-	"date" timestamp NOT NULL,
+	"date" timestamp DEFAULT now() NOT NULL,
 	"person_id" text NOT NULL,
 	"type_transaction_id" text NOT NULL,
 	"fee_id" text
@@ -121,7 +102,8 @@ CREATE TABLE IF NOT EXISTS "transactions" (
 CREATE TABLE IF NOT EXISTS "type_transactions" (
 	"id" text PRIMARY KEY NOT NULL,
 	"description" text,
-	"name" text NOT NULL
+	"name" text NOT NULL,
+	"fee_id" text
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "users" (
@@ -144,12 +126,6 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "auth" ADD CONSTRAINT "auth_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "fees" ADD CONSTRAINT "fees_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -180,6 +156,12 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "transactions" ADD CONSTRAINT "transactions_fee_id_fees_id_fk" FOREIGN KEY ("fee_id") REFERENCES "public"."fees"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "type_transactions" ADD CONSTRAINT "type_transactions_fee_id_fees_id_fk" FOREIGN KEY ("fee_id") REFERENCES "public"."fees"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
