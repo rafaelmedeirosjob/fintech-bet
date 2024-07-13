@@ -5,71 +5,8 @@
     {
       "idx": 0,
       "version": "6",
-      "when": 1715458253067,
-      "tag": "0000_married_living_lightning",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "6",
-      "when": 1715467019292,
-      "tag": "0001_whole_black_panther",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "6",
-      "when": 1715475014882,
-      "tag": "0002_short_young_avengers",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "6",
-      "when": 1719776452298,
-      "tag": "0003_brief_mac_gargan",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "6",
-      "when": 1719937360652,
-      "tag": "0004_short_justice",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "6",
-      "when": 1720039970569,
-      "tag": "0005_foamy_iceman",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "6",
-      "when": 1720122001808,
-      "tag": "0006_clear_rogue",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "6",
-      "when": 1720125620420,
-      "tag": "0007_special_random",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "6",
-      "when": 1720286274306,
-      "tag": "0008_serious_ego",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "6",
-      "when": 1720460441430,
-      "tag": "0009_stale_phil_sheldon",
+      "when": 1720874069923,
+      "tag": "0000_curious_solo",
       "breakpoints": true
     }
   ]

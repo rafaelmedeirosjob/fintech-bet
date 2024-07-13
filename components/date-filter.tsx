@@ -46,8 +46,8 @@ export const DateFilter = () => {
 
   const pushToUrl = (dateRange: DateRange | undefined) => {
     const query = {
-      from: format(dateRange?.from || defaultFrom, "yyyy-MM-dd"),
-      to: format(dateRange?.to || defaultTo, "yyyy-MM-dd"),
+      from: format(dateRange?.from || defaultFrom, "dd-MM-yyyy"),
+      to: format(dateRange?.to || defaultTo, "dd-MM-yyyy"),
       accountId,
     };
 
