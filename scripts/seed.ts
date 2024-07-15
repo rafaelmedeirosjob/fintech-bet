@@ -11,9 +11,9 @@ const db = drizzle(sql);
 
 const SEED_USER_ID = "user_2g1JOKQh3QUlqivKbp70wEJobvd";
 const SEED_FEES = [
-  { id: "1", type: "value", origin: "create-account", value: '6' },
-  { id: "2", type: "value", origin: "withdraw-zero-fee", value: '10' },
-  { id: "3", type: "percent", origin: "withdraw-main-account", value: '15' },
+  { id: "1", type: "value", origin: "create-account", value: '6.00' },
+  { id: "2", type: "value", origin: "withdraw-zero-fee", value: '10.00' },
+  { id: "3", type: "percent", origin: "withdraw-main-account", value: '15.00' },
   { id: "4", type: "percent", origin: "transfer-between-account", value: '0.01' }
 ];
 

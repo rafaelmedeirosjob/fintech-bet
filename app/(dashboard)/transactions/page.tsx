@@ -50,7 +50,7 @@ const TransactionsPage = () => {
         </CardHeader>
         <CardContent>
           <DataTable
-            filterKey="payee"
+            filterKey="documentNumber"
             columns={columns} 
             data={transactions}
             disabled={isDisabled}

@@ -8,6 +8,7 @@ import { EditAccountSheet } from "@/features/accounts/components/edit-account-sh
 import { NewUserSheet } from "@/features/settings/components/new-user-sheet";
 
 import { SubscriptionModal } from "@/features/subscriptions/components/subscription-modal";
+import { QrCodeAccountSheet } from "@/features/accounts/components/account-qrcode";
 
 export const SheetProvider = () => {
   const isMounted = useMountedState();
@@ -18,6 +19,8 @@ export const SheetProvider = () => {
     <>
       <NewAccountSheet />
       <EditAccountSheet />
+
+      <QrCodeAccountSheet />
 
       <NewUserSheet />
 

@@ -7,7 +7,8 @@ END $$;
 CREATE TABLE IF NOT EXISTS "accounts" (
 	"id" text PRIMARY KEY NOT NULL,
 	"status" text,
-	"amount" numeric,
+	"pixStatus" text,
+	"amount" text,
 	"pendingAmount" numeric,
 	"documentNumber" text NOT NULL,
 	"participant" text,
@@ -91,7 +92,7 @@ CREATE TABLE IF NOT EXISTS "subscriptions" (
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "transactions" (
 	"id" text PRIMARY KEY NOT NULL,
-	"amount" integer NOT NULL,
+	"amount" text NOT NULL,
 	"notes" text NOT NULL,
 	"date" timestamp DEFAULT now() NOT NULL,
 	"person_id" text NOT NULL,

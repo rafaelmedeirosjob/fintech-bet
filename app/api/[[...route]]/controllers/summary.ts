@@ -50,9 +50,9 @@ const app = new Hono()
       ) {
         return await db
           .select({
-            income: sql`SUM(CASE WHEN ${transactions.amount} >= 0 THEN ${transactions.amount} ELSE 0 END)`.mapWith(Number),
-            expenses: sql`SUM(CASE WHEN ${transactions.amount} < 0 THEN ${transactions.amount} ELSE 0 END)`.mapWith(Number),
-            remaining: sum(transactions.amount).mapWith(Number),
+            income: sql`SUM(CASE WHEN CAST(${transactions.amount} AS NUMERIC) >= 0 THEN CAST(${transactions.amount} AS NUMERIC) ELSE 0 END)`.mapWith(Number),
+            expenses: sql`SUM(CASE WHEN CAST(${transactions.amount} AS NUMERIC) < 0 THEN CAST(${transactions.amount} AS NUMERIC) ELSE 0 END)`.mapWith(Number),
+            remaining: sum(sql`CAST(${transactions.amount} AS NUMERIC)`).mapWith(Number),
           })
           .from(transactions)
           .innerJoin(person, eq(person.id, transactions.personId))
@@ -94,7 +94,7 @@ const app = new Hono()
       const category = await db
         .select({
           name: typeTransactions.name,
-          value: sql`SUM(ABS(${transactions.amount}))`.mapWith(Number),
+          value: sql`SUM(ABS(CAST(${transactions.amount} AS NUMERIC)))`.mapWith(Number),
         })
         .from(transactions)
         .innerJoin(
@@ -109,14 +109,14 @@ const app = new Hono()
           and(
             accountId ? eq(accounts.id, accountId) : undefined,
             eq(person.userExternalId, auth.userId),
-            lt(transactions.amount, 0),
+            // lt(transactions.amount, 0),
             gte(transactions.date, startDate),
             lte(transactions.date, endDate),
           )
         )
         .groupBy(typeTransactions.name)
         .orderBy(desc(
-          sql`SUM(ABS(${transactions.amount}))`
+          sql`SUM(ABS(CAST(${transactions.amount} AS NUMERIC)))`
         ));
 
       const topCategories = category.slice(0, 3);
@@ -135,8 +135,8 @@ const app = new Hono()
       const activeDays = await db
         .select({
           date: transactions.date,
-          income: sql`SUM(CASE WHEN ${transactions.amount} >= 0 THEN ${transactions.amount} ELSE 0 END)`.mapWith(Number),
-          expenses: sql`SUM(CASE WHEN ${transactions.amount} < 0 THEN ABS(${transactions.amount}) ELSE 0 END)`.mapWith(Number),
+          income: sql`SUM(CASE WHEN CAST(${transactions.amount} AS NUMERIC) >= 0 THEN CAST(${transactions.amount} AS NUMERIC) ELSE 0 END)`.mapWith(Number),
+          expenses: sql`SUM(CASE WHEN CAST(${transactions.amount} AS NUMERIC) < 0 THEN ABS(CAST(${transactions.amount} AS NUMERIC)) ELSE 0 END)`.mapWith(Number),
         })
         .from(transactions)
         .innerJoin(person, eq(person.id, transactions.personId))

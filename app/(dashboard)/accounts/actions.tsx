@@ -4,7 +4,7 @@ import { Edit, MoreHorizontal, KeyRoundIcon, ReceiptCentIcon, QrCodeIcon } from 
 
 import { useOpenAccount } from "@/features/accounts/hooks/use-open-account";
 import { useDeleteAccount } from "@/features/accounts/api/use-delete-account";
-
+import { useOpenPayQrCodeHomeAccount } from "@/features/accounts/hooks/use-open-account-qr-code";
 import { useConfirm } from "@/hooks/use-confirm";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+
 
 type Props = {
   id: string;
@@ -26,14 +27,7 @@ export const Actions = ({ id }: Props) => {
 
   const deleteMutation = useDeleteAccount(id);
   const { onOpen } = useOpenAccount();
-
-  const handleDelete = async () => {
-    const ok = await confirm();
-
-    if (ok) {
-      deleteMutation.mutate();
-    }
-  };
+  const { onOpenQrCode } = useOpenPayQrCodeHomeAccount();
 
   return (
     <>
@@ -60,15 +54,7 @@ export const Actions = ({ id }: Props) => {
             Ativar chave pix
           </DropdownMenuItem>
           <DropdownMenuItem
-            disabled={deleteMutation.isPending}
-            onClick={() => onOpen(id)}
-          >
-            <ReceiptCentIcon className="size-4 mr-2" />
-            Depositar 
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            disabled={deleteMutation.isPending}
-            onClick={() => onOpen(id)}
+            onClick={() => onOpenQrCode(id)}
           >
             <QrCodeIcon className="size-4 mr-2" />
             Pagar QR Code da casa 

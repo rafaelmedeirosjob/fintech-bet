@@ -128,7 +128,8 @@ export const insertAddress = createInsertSchema(address);
 export const accounts = pgTable("accounts", {
   id: text("id").primaryKey(),
   status: text("status"),
-  amount: numeric("amount"),
+  pixStatus: text("pixStatus"),
+  amount: text("amount"),
   pendingAmount: numeric("pendingAmount"),
   documentNumber: text("documentNumber").notNull(),
   participant: text("participant"),
@@ -172,7 +173,7 @@ export const typeTransactionsRelations = relations(typeTransactions, ({ many, on
 
 export const transactions = pgTable("transactions", {
   id: text("id").primaryKey(),
-  amount: integer("amount").notNull(),
+  amount: text("amount").notNull(),
   notes: text("notes").notNull(),
   date: timestamp("date", { mode: "date" }).notNull().defaultNow(),
   personId: text("person_id").references(() => person.id, {

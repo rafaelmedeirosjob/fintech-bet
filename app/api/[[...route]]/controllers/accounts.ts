@@ -57,7 +57,8 @@ const app = new Hono()
           pendingAmount: accounts.pendingAmount,
           name: person.fullName,
           documentNumber: accounts.documentNumber,
-          status: accounts.status
+          status: accounts.status,
+          pixStatus: accounts.pixStatus
         })
         .from(accounts)
         .innerJoin(person, eq(person.id, accounts.personId))
@@ -93,6 +94,7 @@ const app = new Hono()
           id: accounts.id,
           documentNumber: accounts.documentNumber,
           status: accounts.status,
+          pixStatus: accounts.pixStatus,
           amount: accounts.amount,
           fullName: person.fullName
         })
