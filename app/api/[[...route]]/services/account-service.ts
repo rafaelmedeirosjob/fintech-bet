@@ -71,7 +71,9 @@ export const saveAccount = async (userExternalAuthId: any, values: any, userId :
 
   const [dataAccount] = await db.insert(accounts).values({
     id: createId(),
-    status: "PROCESSING",
+    status: "Pendente",
+    pixStatus: "Inativo",
+    amount: "0.00",
     documentNumber: dataPerson.documentNumber == null  ? "" : dataPerson.documentNumber,
     participant: "",
     accountOnboardingType: "",
@@ -83,9 +85,10 @@ export const saveAccount = async (userExternalAuthId: any, values: any, userId :
 
   if(userId == null){
     const [typeTransaction] = await getTypeTransactionFromType("create-account");
+    const feeAmout = typeTransaction.feeAmount != null  ? "-"+typeTransaction.feeAmount.toString() : "0.00"
     const [dataTransactions] = await db.insert(transactions).values({
       id: createId(),
-      amount: Number(typeTransaction.feeAmount),
+      amount: feeAmout.toString(),
       notes: "Taxa relacionada a criação de conta",
       feeId: typeTransaction.feeId,
       typeTransactionId: typeTransaction.id,

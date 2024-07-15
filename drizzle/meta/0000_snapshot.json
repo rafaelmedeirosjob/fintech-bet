@@ -1,5 +1,5 @@
 {
-  "id": "0de70623-c42f-48a0-9ff0-ab9418f4cf0b",
+  "id": "e6a0fecb-23bf-403a-be6d-b9bd1a0556c7",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "6",
   "dialect": "postgresql",
@@ -20,9 +20,15 @@
           "primaryKey": false,
           "notNull": false
         },
+        "pixStatus": {
+          "name": "pixStatus",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "amount": {
           "name": "amount",
-          "type": "numeric",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -532,7 +538,7 @@
         },
         "amount": {
           "name": "amount",
-          "type": "integer",
+          "type": "text",
           "primaryKey": false,
           "notNull": true
         },

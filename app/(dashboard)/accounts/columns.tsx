@@ -78,15 +78,72 @@ export const columns: ColumnDef<ResponseType>[] = [
       )
     },
     cell: ({ row }) => {
-      const status = row.getValue("status");
+      const status = String(row.getValue("status"));
 
       return (
         <Badge
-          variant={status ==="Inactive" ? "destructive" : "primary"}
+          variant={validateStatus()}
           className="text-xs font-medium px-3.5 py-2.5"
-        >
+        > 
+        {status ?? ""}
         </Badge>
       );
+
+      function validateStatus(): "default" | "destructive" | "outline" | "secondary" | "primary" | null | undefined {
+        switch (status){
+          case "Pendente":
+            console.log("entrou")
+            return "default";
+          case "Inativo":
+            return "destructive";
+          case "Ativo":
+            return "primary"
+          case "" || null:
+            return "secondary"
+          default:
+            return undefined;
+        }
+      }
+    }
+  },
+
+  {
+    accessorKey: "pixStatus",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Chave Pix
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: ({ row }) => {
+      const statusPix =  String(row.getValue("pixStatus"));
+
+      return (
+        <Badge
+          variant={validateStatus()}
+          className="text-xs font-medium px-3.5 py-2.5"
+        >
+          {statusPix}
+        </Badge>
+      );
+
+      function validateStatus(): "default" | "destructive" | "outline" | "secondary" | "primary" | null | undefined {
+        switch (statusPix){
+          case "Pendente":
+            return "default";
+          case "Inativo":
+            return "destructive";
+          case "Ativo":
+            return "primary"
+          case "" || null:
+            return "secondary"
+        }
+      }
     }
   },
   {
