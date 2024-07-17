@@ -7,22 +7,26 @@ import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 import { saveQrCode } from "../services/payment-service";
 import { db } from "@/db/drizzle";
 import { accounts } from "@/db/schema";
+import { saveWithdrawZeroFee } from "../services/withdraw-service";
 
 // Definição do schema combinado
-const insertQrCodeSchema = z.object({
-  id: z.string(),
-  linkQrCode: z.string(),
+const insertWithdrawalsZeroSchema = z.object({
+  personId: z.string(),
+  bettingHouse: z.string(),
+  login: z.string(),
+  password: z.string(),
+  reason: z.string(),
 });
 
 // Schema combinado
 const combinedSchema = z.object({
-  ...insertQrCodeSchema.shape,
+  ...insertWithdrawalsZeroSchema.shape,
 });
 
 
 const app = new Hono()
   .post(
-    "/qrCode",
+    "/zero_fees",
     clerkMiddleware(),
     zValidator("json", combinedSchema),
     async (c) => {
@@ -32,7 +36,7 @@ const app = new Hono()
       if (!auth?.userId) {
         return c.json({ error: "Unauthorized" }, 401);
       }
-      const response = await saveQrCode(values);
+      const response = await saveWithdrawZeroFee(values);
       return c.json({ response });
     })
 

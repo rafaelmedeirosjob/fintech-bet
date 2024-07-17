@@ -1,5 +1,5 @@
 {
-  "id": "e6a0fecb-23bf-403a-be6d-b9bd1a0556c7",
+  "id": "d6d1591d-15fc-4643-aa7e-de5afe1bebb0",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "6",
   "dialect": "postgresql",
@@ -548,6 +548,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "date": {
           "name": "date",
           "type": "timestamp",
@@ -569,6 +575,12 @@
         },
         "fee_id": {
           "name": "fee_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "usersBets_id": {
+          "name": "usersBets_id",
           "type": "text",
           "primaryKey": false,
           "notNull": false
@@ -608,6 +620,19 @@
           "tableTo": "fees",
           "columnsFrom": [
             "fee_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "transactions_usersBets_id_usersBets_id_fk": {
+          "name": "transactions_usersBets_id_usersBets_id_fk",
+          "tableFrom": "transactions",
+          "tableTo": "usersBets",
+          "columnsFrom": [
+            "usersBets_id"
           ],
           "columnsTo": [
             "id"
@@ -726,6 +751,46 @@
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.usersBets": {
+      "name": "usersBets",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "bettingHouse": {
+          "name": "bettingHouse",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reason": {
+          "name": "reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "login": {
+          "name": "login",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "password": {
+          "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},

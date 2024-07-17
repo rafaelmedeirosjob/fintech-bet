@@ -9,6 +9,8 @@ import { NewUserSheet } from "@/features/settings/components/new-user-sheet";
 
 import { SubscriptionModal } from "@/features/subscriptions/components/subscription-modal";
 import { QrCodeAccountSheet } from "@/features/accounts/components/account-qrcode";
+import { WithdrawZeroSheet } from "@/features/accounts/components/withdraw-zero-form";
+import { FeesSheet } from "@/features/settings/components/fees-form";
 
 export const SheetProvider = () => {
   const isMounted = useMountedState();
@@ -23,6 +25,8 @@ export const SheetProvider = () => {
       <QrCodeAccountSheet />
 
       <NewUserSheet />
+      <FeesSheet />
+      <WithdrawZeroSheet />
 
       <SubscriptionModal />
     </>
