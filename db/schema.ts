@@ -144,8 +144,7 @@ export const accounts = pgTable("accounts", {
   updatedAt: timestamp('updated_at'),
 });
 
-export const accountsRelations = relations(accounts, ({ many, one }) => ({
-  transactions: many(transactions),
+export const accountsRelations = relations(accounts, ({ one }) => ({
   person: one(person, {
     fields: [accounts.personId],
     references: [person.id],
@@ -171,10 +170,20 @@ export const typeTransactionsRelations = relations(typeTransactions, ({ many, on
   })
 }));
 
+
+export const usersBets = pgTable("usersBets", {
+  id: text("id").primaryKey(),
+  bettingHouse: text("bettingHouse").notNull(),
+  reason: text("reason").notNull(),
+  login: text("login").notNull(),
+  password: text("password").notNull()
+});
+
 export const transactions = pgTable("transactions", {
   id: text("id").primaryKey(),
   amount: text("amount").notNull(),
   notes: text("notes").notNull(),
+  status: text("status").notNull(),
   date: timestamp("date", { mode: "date" }).notNull().defaultNow(),
   personId: text("person_id").references(() => person.id, {
     onDelete: "cascade",
@@ -183,6 +192,9 @@ export const transactions = pgTable("transactions", {
     onDelete: "cascade",
   }).notNull(),
   feeId: text("fee_id").references(() => fees.id, {
+    onDelete: "cascade",
+  }),
+  usersBetsId: text("usersBets_id").references(() => usersBets.id, {
     onDelete: "cascade",
   })
 });
@@ -195,6 +207,10 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({
   fee: one(fees, {
     fields: [transactions.feeId],
     references: [fees.id],
+  }),
+  userBet: one(usersBets, {
+    fields: [transactions.usersBetsId],
+    references: [usersBets.id],
   })
   ,
   typeTransactions: one(typeTransactions, {
@@ -206,6 +222,8 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({
 export const insertTransactionSchema = createInsertSchema(transactions, {
   date: z.coerce.date(),
 });
+
+
 
 export const connectedBanks = pgTable("connected_banks", {
   id: text("id").primaryKey(),

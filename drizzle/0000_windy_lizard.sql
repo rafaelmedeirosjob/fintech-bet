@@ -94,10 +94,12 @@ CREATE TABLE IF NOT EXISTS "transactions" (
 	"id" text PRIMARY KEY NOT NULL,
 	"amount" text NOT NULL,
 	"notes" text NOT NULL,
+	"status" text NOT NULL,
 	"date" timestamp DEFAULT now() NOT NULL,
 	"person_id" text NOT NULL,
 	"type_transaction_id" text NOT NULL,
-	"fee_id" text
+	"fee_id" text,
+	"usersBets_id" text
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "type_transactions" (
@@ -117,6 +119,14 @@ CREATE TABLE IF NOT EXISTS "users" (
 	"user_external_id" text NOT NULL,
 	"created_at" timestamp DEFAULT now() NOT NULL,
 	"updated_at" timestamp
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "usersBets" (
+	"id" text PRIMARY KEY NOT NULL,
+	"bettingHouse" text NOT NULL,
+	"reason" text NOT NULL,
+	"login" text NOT NULL,
+	"password" text NOT NULL
 );
 --> statement-breakpoint
 DO $$ BEGIN
@@ -157,6 +167,12 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "transactions" ADD CONSTRAINT "transactions_fee_id_fees_id_fk" FOREIGN KEY ("fee_id") REFERENCES "public"."fees"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "transactions" ADD CONSTRAINT "transactions_usersBets_id_usersBets_id_fk" FOREIGN KEY ("usersBets_id") REFERENCES "public"."usersBets"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

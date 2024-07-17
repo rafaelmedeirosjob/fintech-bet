@@ -1,6 +1,7 @@
 "use client"
 
 import { format } from "date-fns";
+import { ptBR } from 'date-fns/locale';
 import { InferResponseType } from "hono";
 import { ArrowUpDown } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
@@ -56,7 +57,7 @@ export const columns: ColumnDef<ResponseType>[] = [
 
       return (
         <span>
-          {format(date, "dd MMMM, yyyy")}
+          {format(date, "dd MMMM, yyyy hh:mm:ss", { locale: ptBR })}
         </span>
       )
     }

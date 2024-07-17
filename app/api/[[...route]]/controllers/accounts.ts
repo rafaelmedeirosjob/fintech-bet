@@ -92,6 +92,7 @@ const app = new Hono()
       const [data] = await db
         .select({
           id: accounts.id,
+          personId: accounts.personId,
           documentNumber: accounts.documentNumber,
           status: accounts.status,
           pixStatus: accounts.pixStatus,

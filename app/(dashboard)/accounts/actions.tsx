@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import { useOpenWithdrawZero } from "@/features/accounts/hooks/use-open-withdraw-zero";
 
 
 type Props = {
@@ -28,6 +29,7 @@ export const Actions = ({ id }: Props) => {
   const deleteMutation = useDeleteAccount(id);
   const { onOpen } = useOpenAccount();
   const { onOpenQrCode } = useOpenPayQrCodeHomeAccount();
+  const { onOpenWithdrawZero } = useOpenWithdrawZero();
 
   return (
     <>
@@ -58,6 +60,12 @@ export const Actions = ({ id }: Props) => {
           >
             <QrCodeIcon className="size-4 mr-2" />
             Pagar QR Code da casa 
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => onOpenWithdrawZero(id)}
+          >
+            <QrCodeIcon className="size-4 mr-2" />
+            Solicitar saque taxa zero
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

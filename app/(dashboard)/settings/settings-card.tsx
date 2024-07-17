@@ -16,9 +16,12 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { useOpenUser } from "@/features/settings/hooks/use-open-user";
 import { useGetUserMain } from "@/features/settings/api/use-get-user-main";
+import { useOpenFees } from "@/features/settings/hooks/use-open-fees";
+
 
 export const SettingsCard = () => {
   const { onOpen } = useOpenUser();
+  const { onOpenFees } = useOpenFees();
   const {
     data: userCreated,
     isLoading: isLoadingUser,
@@ -97,6 +100,7 @@ export const SettingsCard = () => {
             <SubscriptionCheckout />
           </div>
         </div>
+
         <Separator />
         <div className="flex flex-col gap-y-2 lg:flex-row items-center py-4">
           <p className="text-sm font-medium w-full lg:w-[16.5rem]">
@@ -109,7 +113,7 @@ export const SettingsCard = () => {
                Visualize as menores taxas do mercado oferecidas por nós
             </div>
             <Button
-              onClick={() => onOpen(userCreated)}
+              onClick={() => onOpenFees(userCreated?.id)}
               disabled={false}
               size="sm"
               variant="ghost"
