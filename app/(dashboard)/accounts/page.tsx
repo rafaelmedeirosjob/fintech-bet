@@ -4,7 +4,6 @@ import { Loader2, Plus } from "lucide-react";
 
 import { useNewAccount } from "@/features/accounts/hooks/use-new-account";
 import { useGetAccounts } from "@/features/accounts/api/use-get-accounts";
-import { useBulkDeleteAccounts } from "@/features/accounts/api/use-bulk-delete-accounts";
 
 import { Button } from "@/components/ui/button";
 import { DataTable } from "@/components/data-table-account";
@@ -20,13 +19,11 @@ import { columns } from "./columns";
 
 const AccountsPage = () => {
   const newAccount = useNewAccount();
-  const deleteAccounts = useBulkDeleteAccounts();
   const accountsQuery = useGetAccounts();
   const accounts = accountsQuery.data || [];
   console.log(accountsQuery)
   const isDisabled =
-    accountsQuery.isLoading ||
-    deleteAccounts.isPending;
+    accountsQuery.isLoading
 
   if (accountsQuery.isLoading) {
     return (
@@ -63,8 +60,7 @@ const AccountsPage = () => {
             columns={columns} 
             data={accounts}
             onDelete={(row) => {
-              const ids = row.map((r) => r.original.id);
-              deleteAccounts.mutate({ ids });
+              row.map((r) => r.original.id);
             }}
             disabled={isDisabled}
           />

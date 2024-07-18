@@ -3,7 +3,7 @@
 import { Edit, MoreHorizontal, KeyRoundIcon, ReceiptCentIcon, BadgeXIcon, QrCodeIcon } from "lucide-react";
 
 import { useOpenAccount } from "@/features/accounts/hooks/use-open-account";
-import { useDeleteAccount } from "@/features/accounts/api/use-delete-account";
+import { useActivePixAccount } from "@/features/accounts/api/use-active-pix-account";
 import { useOpenPayQrCodeHomeAccount } from "@/features/accounts/hooks/use-open-account-qr-code";
 import { useConfirm } from "@/hooks/use-confirm";
 import { Button } from "@/components/ui/button";
@@ -22,14 +22,22 @@ type Props = {
 
 export const Actions = ({ id }: Props) => {
   const [ConfirmDialog, confirm] = useConfirm(
-    "Você tem certeza?",
-    "Você está excluindo esta conta."
+    "Você realmente quer ativar a chave pix para esta conta?",
+    "A chave tem duração de 1 hora."
   );
 
-  const deleteMutation = useDeleteAccount(id);
+  const activePixMutation = useActivePixAccount(id);
   const { onOpen } = useOpenAccount();
   const { onOpenQrCode } = useOpenPayQrCodeHomeAccount();
   const { onOpenWithdrawZero } = useOpenWithdrawZero();
+
+  const handleactivePix = async () => {
+    const ok = await confirm();
+
+    if (ok) {
+      activePixMutation.mutate({accountId: id});
+    }
+  };
 
   return (
     <>
@@ -42,15 +50,15 @@ export const Actions = ({ id }: Props) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem
-            disabled={deleteMutation.isPending}
+            disabled={activePixMutation.isPending}
             onClick={() => onOpen(id)}
           >
             <Edit className="size-4 mr-2" />
             Editar
           </DropdownMenuItem>
           <DropdownMenuItem
-            disabled={deleteMutation.isPending}
-            onClick={() => onOpen(id)}
+              disabled={activePixMutation.isPending}
+              onClick={handleactivePix}
           >
             <KeyRoundIcon className="size-4 mr-2" />
             Ativar chave pix

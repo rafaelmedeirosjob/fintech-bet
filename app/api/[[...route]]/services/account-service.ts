@@ -76,4 +76,11 @@ export const saveAccount = async (userExternalAuthId: any, values: any, userId :
   
 }
 
+export const createPixAccount = async (values: any) => {
+
+  const data = null
+  return data;
+  
+}
+
 

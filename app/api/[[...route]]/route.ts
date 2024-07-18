@@ -4,6 +4,7 @@ import summary from "./controllers/summary";
 import accounts from "./controllers/accounts";
 import payments from "./controllers/payments";
 import withdrawals from "./controllers/withdrawals";
+import fees from "./controllers/fees";
 import users from "./controllers/users";
 import transactions from "./controllers/transactions";
 import subscriptions from "./controllers/subscriptions";
@@ -17,6 +18,7 @@ const routes = app
   .route("/accounts", accounts)
   .route("/payments", payments)
   .route("/withdrawals", withdrawals)
+  .route("/fees", fees)
   .route("/users", users)
   .route("/transactions", transactions)
   .route("/subscriptions", subscriptions)
