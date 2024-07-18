@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
-import { useOpenPayQrCodeHomeAccount } from "@/features/accounts/hooks/use-open-account-qr-code";
+import { useOpenFees } from "@/features/settings/hooks/use-open-fees";
 import { useGetFees } from "@/features/settings/api/use-get-fees";
 
 import {
@@ -21,7 +21,7 @@ import {
 } from "@nextui-org/table";
 
 export const FeesSheet = () => {
-  const { isOpen, onCloseQrCode, id } = useOpenPayQrCodeHomeAccount();
+  const { isOpen, onCloseFees, id } = useOpenFees();
 
   console.log({
     isOpen,
@@ -36,7 +36,7 @@ export const FeesSheet = () => {
 
   return (
     <>
-      <Sheet open={isOpen} onOpenChange={onCloseQrCode}>
+      <Sheet open={isOpen} onOpenChange={onCloseFees}>
         <SheetContent className="space-y-4">
           <SheetHeader>
             <SheetTitle>
