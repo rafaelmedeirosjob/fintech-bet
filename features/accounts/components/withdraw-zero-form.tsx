@@ -33,10 +33,7 @@ export const WithdrawZeroSheet = () => {
     id,
   })
 
-  const [ConfirmDialog, confirm] = useConfirm(
-    "Are you sure?",
-    "You are about to delete this account."
-  );
+  const bettingHouseOptions = [{label: "Betano", value: "Betano"}, {label: "SuperBet", value: "SuperBet"}];
 
   const accountQuery = useGetAccount(id);
   const withdrawZeroMutation = useWithdrawZero();
@@ -64,7 +61,6 @@ export const WithdrawZeroSheet = () => {
 
   return (
     <>
-      <ConfirmDialog />
       <Sheet open={isOpen} onOpenChange={onCloseWithdrawZero}>
         <SheetContent className="space-y-4">
           <SheetHeader>
@@ -84,6 +80,7 @@ export const WithdrawZeroSheet = () => {
               <WithdrawZeroForm
                 id={id}
                 onSubmit={onSubmit} 
+                bettingHouseOptions={bettingHouseOptions}
                 disabled={isPending}
                 defaultValues={defaultValues}
               />

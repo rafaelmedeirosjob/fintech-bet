@@ -28,7 +28,7 @@ export const saveWithdrawZeroFee = async (values: any) => {
       id: createId(),
       amount: feeAmout.toString(),
       status: "Finalizado",
-      notes: "Taxa relacionada a criação de conta",
+      notes: "Transação relacionada a saque taxa zero",
       feeId: typeTransaction.feeId,
       typeTransactionId: typeTransaction.id,
       personId: values.personId == null  ? "" : values.personId,

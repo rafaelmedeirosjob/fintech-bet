@@ -13,7 +13,8 @@ import { saveWithdrawZeroFee } from "../services/withdraw-service";
 const insertWithdrawalsZeroSchema = z.object({
   personId: z.string(),
   bettingHouse: z.string(),
-  login: z.string(),
+  login: z.string(), 
+  amount: z.string(),
   password: z.string(),
   reason: z.string(),
 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { Edit, MoreHorizontal, KeyRoundIcon, ReceiptCentIcon, QrCodeIcon } from "lucide-react";
+import { Edit, MoreHorizontal, KeyRoundIcon, ReceiptCentIcon, BadgeXIcon, QrCodeIcon } from "lucide-react";
 
 import { useOpenAccount } from "@/features/accounts/hooks/use-open-account";
 import { useDeleteAccount } from "@/features/accounts/api/use-delete-account";
@@ -64,7 +64,7 @@ export const Actions = ({ id }: Props) => {
           <DropdownMenuItem
             onClick={() => onOpenWithdrawZero(id)}
           >
-            <QrCodeIcon className="size-4 mr-2" />
+            <BadgeXIcon className="size-4 mr-2" />
             Solicitar saque taxa zero
           </DropdownMenuItem>
         </DropdownMenuContent>
