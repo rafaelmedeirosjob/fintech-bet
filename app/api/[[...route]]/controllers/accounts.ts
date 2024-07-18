@@ -4,7 +4,7 @@ import { and, eq, inArray, isNull } from "drizzle-orm";
 import { createId } from "@paralleldrive/cuid2";
 import { zValidator } from "@hono/zod-validator";
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
-import { saveAccount } from "../services/account-service";
+import { createPixAccount, saveAccount } from "../services/account-service";
 import { db } from "@/db/drizzle";
 import { accounts, insertAccountSchema, person, transactions, address } from "@/db/schema";
 
@@ -36,6 +36,10 @@ const insertAddressSchema = z.object({
 const combinedSchema = z.object({
   ...insertPersonSchema.shape,
   ...insertAddressSchema.shape,
+});
+
+const createPixSchema = z.object({
+  accountId: z.string().optional(),
 });
 
 
@@ -130,6 +134,22 @@ const app = new Hono()
 
       
     })
+    .post(
+      "/create_pix",
+      clerkMiddleware(),
+      zValidator("json", createPixSchema),
+      async (c) => {
+        const auth = getAuth(c);
+        const values = c.req.valid("json");
+  
+        if (!auth?.userId) {
+          return c.json({ error: "Unauthorized" }, 401);
+        }
+        const response = await createPixAccount(values);
+        return c.json({ response });
+  
+        
+      })
   .post(
     "/bulk-delete",
     clerkMiddleware(),
