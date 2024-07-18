@@ -1,11 +1,8 @@
 import { z } from "zod";
 import { Loader2 } from "lucide-react";
-
-import { useGetAccount } from "@/features/accounts/api/use-get-account";
 import { useOpenPayQrCodeHomeAccount } from "@/features/accounts/hooks/use-open-account-qr-code";
-import { useQrCodeAccount } from "@/features/accounts/api/use-qr-code-account";
+import { useGetFees } from "@/features/settings/api/use-get-fees";
 
-import { useConfirm } from "@/hooks/use-confirm";
 import {
   Sheet,
   SheetContent,
@@ -13,12 +10,15 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import {  FeesForm } from "./user-fees-form";
 
-type FormValues = {
-  linkQrCode: string;
-  id: string;
-}
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableColumn,
+  TableRow,
+  TableCell
+} from "@nextui-org/table";
 
 export const FeesSheet = () => {
   const { isOpen, onCloseQrCode, id } = useOpenPayQrCodeHomeAccount();
@@ -28,47 +28,59 @@ export const FeesSheet = () => {
     id,
   })
 
-  const accountQuery = useGetAccount(id);
-  const qrCodeMutation = useQrCodeAccount(id);
+  const feesMutation = useGetFees();
 
   const isPending =
-  qrCodeMutation.isPending
+  feesMutation.isPending
 
-  const isLoading = accountQuery.isLoading;
 
-  const onSubmit = (values: FormValues) => {
-    qrCodeMutation.mutate(values, {
-      onSuccess: () => {
-        onCloseQrCode();
-      },
-    });
-  };
-
-  const defaultValues = { linkQrCode: "", id: id != null ? id : ""}
   return (
     <>
       <Sheet open={isOpen} onOpenChange={onCloseQrCode}>
         <SheetContent className="space-y-4">
           <SheetHeader>
             <SheetTitle>
-              Pagar QRCode
+              Taxas
             </SheetTitle>
             <SheetDescription>
-              Pague o QRCode gerado na casa de apostas, você está utilizando do seu saldo principal.
+              Visualize todas as nossas taxas cobradas, todas são descontadas automaticamente do saldo da conta mãe ao realizar as ações seguintes ações.
             </SheetDescription>
           </SheetHeader>
-          {isLoading
+          {isPending
             ? (
               <div className="absolute inset-0 flex items-center justify-center">
                 <Loader2 className="size-4 text-muted-foreground animate-spin" />
               </div>
             ) : (
-              <FeesForm
-                id={id}
-                onSubmit={onSubmit} 
-                disabled={isPending}
-                defaultValues={defaultValues}
-              />
+              <Table aria-label="Example static collection table">
+              <TableHeader>
+                <TableColumn>NAME</TableColumn>
+                <TableColumn>ROLE</TableColumn>
+                <TableColumn>STATUS</TableColumn>
+              </TableHeader>
+              <TableBody>
+                <TableRow key="1">
+                  <TableCell>Tony Reichert</TableCell>
+                  <TableCell>CEO</TableCell>
+                  <TableCell>Active</TableCell>
+                </TableRow>
+                <TableRow key="2">
+                  <TableCell>Zoey Lang</TableCell>
+                  <TableCell>Technical Lead</TableCell>
+                  <TableCell>Paused</TableCell>
+                </TableRow>
+                <TableRow key="3">
+                  <TableCell>Jane Fisher</TableCell>
+                  <TableCell>Senior Developer</TableCell>
+                  <TableCell>Active</TableCell>
+                </TableRow>
+                <TableRow key="4">
+                  <TableCell>William Howard</TableCell>
+                  <TableCell>Community Manager</TableCell>
+                  <TableCell>Vacation</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
             )
           }
         </SheetContent>
