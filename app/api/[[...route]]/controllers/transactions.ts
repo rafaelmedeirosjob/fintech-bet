@@ -49,6 +49,7 @@ const app = new Hono()
           date: transactions.date,
           type: typeTransactions.description,
           idType: typeTransactions.id,
+          status: transactions.status,
           amount: transactions.amount,
           notes: transactions.notes,
           documentNumber: person.documentNumber,
@@ -92,6 +93,7 @@ const app = new Hono()
           id: transactions.id,
           date: transactions.date,
           type: typeTransactions.description,
+          status: transactions.status,
           amount: transactions.amount,
           notes: transactions.notes,
           documentNumber: person.documentNumber
