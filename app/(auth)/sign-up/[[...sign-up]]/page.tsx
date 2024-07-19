@@ -24,7 +24,7 @@ export default function Page() {
         </div>
       </div>
       <div className="h-full bg-green-600 hidden lg:flex items-center justify-center">
-        <Image src="/logo.svg" height={100} width={100} alt="Logo" />
+        <Image src="/logo-rollbank.svg" height={500} width={500} alt="Logo" />
       </div>
     </div>
   );
