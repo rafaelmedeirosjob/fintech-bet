@@ -11,7 +11,7 @@ export const WelcomeMsg = () => {
         Bem vindo {isLoaded ? ", " : " "}{user?.firstName} 👋🏻
       </h2>
       <p className="text-sm lg:text-base text-[#edf4ff]">
-        Administre e pontencialize seus ganhos com as menores taxas
+        {/* Administre e pontencialize seus ganhos com as menores taxas */}
       </p>
     </div>
   );
